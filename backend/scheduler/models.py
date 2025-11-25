@@ -21,7 +21,6 @@ class Event(models.Model):
     facility = models.ForeignKey(Facility, on_delete=models.CASCADE, related_name='events')
     is_fixed = models.BooleanField(default=False, help_text="County fixtures – cannot be moved")
     team_name = models.CharField(max_length=100, blank=True, null=True)
-
     def clean(self):
         if self.end_time <= self.start_time:
             raise ValidationError("End time must be after start time")
