@@ -2,6 +2,7 @@
 backend/clubsync_venv/
 backend/__pycache__/
 backend/*/migrations/__pycache__/
+backend/scheduler/migrations/*.pyc
 *.pyc
 __pycache__/
 db.sqlite3
@@ -11,6 +12,7 @@ db.sqlite3
 # IDE
 .idea/
 .vscode/
+
 *.swp
 *.swo
 
