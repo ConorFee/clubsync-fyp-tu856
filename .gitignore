@@ -1,0 +1,18 @@
+# Python / Django
+backend/clubsync_venv/
+backend/__pycache__/
+backend/*/migrations/__pycache__/
+*.pyc
+__pycache__/
+db.sqlite3
+*.log
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
