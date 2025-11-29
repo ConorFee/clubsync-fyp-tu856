@@ -16,7 +16,7 @@ class Command(BaseCommand):
         events = [
             ("Senior Men vs Bray Emmets", "2025-04-05", "14:30", "16:30", main, True),
             ("U14 Boys Training", "2025-01-20", "18:30", "20:00", training, False),
-            ("U12 Girls Training", "2025-01-20", "18:30", "19:30", training, False),  # ← OVERLAP!
+            ("U12 Girls Training", "2025-01-20", "18:30", "19:30", training, False),  # mimics the overlap
             ("Senior Ladies Training", "2025-01-21", "19:00", "20:30", hall, False),
             ("U16 Boys vs Roundwood", "2025-03-15", "11:00", "12:30", main, True),
             ("U17 Strength & Conditioning", "2025-01-22", "19:30", "20:30", hall, False),
