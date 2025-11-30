@@ -5,6 +5,9 @@ import { fetchEvents } from "./api/events";
 import { runSolverCheck } from "./api/solver";
 
 import CalendarView from "./components/CalendarView";
+import Sidebar from "./components/sidebar/Sidebar";
+
+import "./styles/App.css"; // <-- Make sure App.css contains layout styles
 
 function App() {
   const [events, setEvents] = useState<EventType[]>([]);
@@ -16,6 +19,12 @@ function App() {
       .catch((err) => console.error("Error loading events:", err));
   }, []);
 
+  const handleRefreshEvents = () => {
+    fetchEvents()
+      .then((data) => setEvents(data))
+      .catch((err) => console.error("Refresh error:", err));
+  };
+
   const handleSolverRun = () => {
     runSolverCheck()
       .then((message) => setSolverStatus(message))
@@ -23,37 +32,29 @@ function App() {
   };
 
   return (
-    <div style={{ padding: "40px", fontFamily: "system-ui, sans-serif" }}>
-      <h1 style={{ color: "white" }}>ClubSync – An Tóchar GAA</h1>
+    <div className="app-container">
+      {/* --- HEADER --- */}
+      <header className="app-header">
+        <h1>ClubSync – An Tóchar GAA</h1>
 
-      <button
-        onClick={handleSolverRun}
-        style={{
-          padding: "12px 24px",
-          fontSize: "18px",
-          background: "#1a5fb4",
-          color: "white",
-          borderRadius: "8px",
-          cursor: "pointer",
-          marginBottom: "20px",
-        }}
-      >
-        Run Solver Check
-      </button>
+        <button className="solver-btn" onClick={handleSolverRun}>
+          Run Solver Check
+        </button>
 
-      {solverStatus && (
-        <h2
-          style={{
-            color: solverStatus.includes("feasible") ? "#2ecc71" : "#e74c3c",
-            marginBottom: "20px",
-          }}
-        >
-          {solverStatus}
-        </h2>
-      )}
+        {solverStatus && (
+          <h2 className={`solver-status ${solverStatus.includes("feasible") ? "ok" : "error"}`}>
+            {solverStatus}
+          </h2>
+        )}
+      </header>
 
-      <div style={{ background: "white", padding: "20px", borderRadius: "12px" }}>
-        <CalendarView events={events} />
+      {/* --- MAIN LAYOUT (Sidebar + Calendar) --- */}
+      <div className="main-layout">
+        <Sidebar onRefresh={handleRefreshEvents} />
+
+        <div className="calendar-wrapper">
+          <CalendarView events={events} />
+        </div>
       </div>
     </div>
   );

@@ -1,0 +1,29 @@
+.sidebar-container {
+    width: 250px;
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-right: 1px solid #333;
+    height: 100vh;
+  }
+  
+  .sidebar-title {
+    color: white;
+    margin-bottom: 20px;
+  }
+  
+  .sidebar-refresh-btn {
+    padding: 8px 12px;
+    margin-bottom: 20px;
+    cursor: pointer;
+  }
+  
+  .sidebar-list li {
+    color: #ccc;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  
+  .sidebar-list li:hover {
+    color: white;
+  }
+  
