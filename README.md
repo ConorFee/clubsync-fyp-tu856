@@ -230,7 +230,7 @@ curl -X POST http://localhost:8000/api/schedule/solve/
 
 ---
 
-## 📊 Current Progress
+## Current Progress
 
 ### Completed (Interim Submission)
 
@@ -258,7 +258,7 @@ curl -X POST http://localhost:8000/api/schedule/solve/
 - [ ] Team model implementation
 - [ ] Unit test suite (>80% coverage)
 - [ ] Docker containerization
-- [ ] Deployment to Render
+- [ ] Deployment to DigitalOcean
 - [ ] User Acceptance Testing with An Tóchar GAA
 - [ ] Predictive analytics (volunteer demand forecasting)
 
