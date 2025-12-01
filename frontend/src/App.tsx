@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { EventType } from "./types/types";
+import type { EventType, FacilityType } from "./types/types";
 
 import { fetchEvents } from "./api/events";
 import { runSolverCheck } from "./api/solver";
@@ -13,6 +13,12 @@ function App() {
   const [events, setEvents] = useState<EventType[]>([]);
   const [solverStatus, setSolverStatus] = useState("");
 
+  const [selectedFacility, setSelectedFacility] = useState<string>("All");
+
+  const filteredEvents = events.filter(e =>
+    selectedFacility === "All" ? true : e.facility.name === selectedFacility
+  );
+  
   useEffect(() => {
     fetchEvents()
       .then((data) => setEvents(data))
@@ -50,7 +56,12 @@ function App() {
 
       {/* --- MAIN LAYOUT (Sidebar + Calendar) --- */}
       <div className="main-layout">
-        <Sidebar onRefresh={handleRefreshEvents} />
+        <Sidebar 
+          onRefresh={handleRefreshEvents} 
+          events={filteredEvents}
+          selectedFacility={selectedFacility}
+          onSelectFacility={setSelectedFacility}
+        />
 
         <div className="calendar-wrapper">
           <CalendarView events={events} />

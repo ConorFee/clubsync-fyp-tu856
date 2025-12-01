@@ -12,3 +12,4 @@ export interface EventType {
     facility: FacilityType;
     is_fixed: boolean;
 }
+

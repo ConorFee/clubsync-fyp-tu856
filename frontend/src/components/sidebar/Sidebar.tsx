@@ -1,24 +1,64 @@
 import "./Sidebar.css";
+import type { EventType } from "../../types/types";
 
 interface SidebarProps {
-  onRefresh?: () => void;   // optional callback
+  onRefresh: () => void;
+  events: EventType[];
+  selectedFacility: string;
+  onSelectFacility: (name: string) => void;
 }
 
-export default function Sidebar({ onRefresh }: SidebarProps) {
+export default function Sidebar({
+  onRefresh,
+  events,
+  selectedFacility,
+  onSelectFacility,
+}: SidebarProps) {
+  
+  const facilityOptions = ["All", "Main Pitch", "Training Pitch", "Hall", "Gym"];
+
   return (
     <div className="sidebar-container">
-      <h2 className="sidebar-title">Facilities</h2>
+      <h2 className="sidebar-title">Facility Bookings</h2>
 
-      <button className="sidebar-refresh-btn" onClick={onRefresh}>
-        Refresh Events
-      </button>
+      <div className="sidebar-filter-section">
+        <label className="filter-label">Filters</label>
 
-      <ul className="sidebar-list">
-        <li>Main Pitch</li>
-        <li>Training Pitch</li>
-        <li>Hall</li>
-        <li>Gym</li>
-      </ul>
+        <select
+          className="facility-dropdown"
+          value={selectedFacility}
+          onChange={(e) => onSelectFacility(e.target.value)}
+        >
+          {facilityOptions.map((f) => (
+            <option key={f} value={f}>
+              {f}
+            </option>
+          ))}
+        </select>
+
+        <button className="sidebar-refresh-btn" onClick={onRefresh}>
+          Refresh Events
+        </button>
+      </div>
+
+      {/* --- Event Cards --- */}
+      <div className="event-list">
+        {events.length === 0 && (
+          <p className="no-events">No events for this facility.</p>
+        )}
+
+        {events.map((ev) => (
+          <div key={ev.id} className="event-card">
+            <div className="event-title">{ev.title}</div>
+
+            <div className="event-meta">
+              <span>{ev.is_fixed ? "Fixed" : "Scheduled"}</span>
+              <span>•</span>
+              <span>{ev.facility.name}</span>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

@@ -1,29 +1,80 @@
 .sidebar-container {
-    width: 250px;
-    background-color: #1e1e1e;
+    width: 280px;
     padding: 20px;
-    border-right: 1px solid #333;
-    height: 100vh;
+    background-color: #1f1f1f;
+    color: white;
+    overflow-y: auto;
   }
   
   .sidebar-title {
-    color: white;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+    font-weight: bold;
+  }
+  
+  .sidebar-filter-section {
     margin-bottom: 20px;
+  }
+  
+  .filter-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+  
+  .facility-dropdown {
+    width: 100%;
+    padding: 8px;
+    background-color: #2c2c2c;
+    border: 1px solid #444;
+    color: white;
+    border-radius: 4px;
+    margin-bottom: 10px;
   }
   
   .sidebar-refresh-btn {
+    width: 100%;
     padding: 8px 12px;
-    margin-bottom: 20px;
+    background-color: #1a73e8;
+    border: none;
+    border-radius: 4px;
     cursor: pointer;
   }
   
-  .sidebar-list li {
-    color: #ccc;
-    margin-bottom: 10px;
-    cursor: pointer;
+  .event-list {
+    margin-top: 10px;
   }
   
-  .sidebar-list li:hover {
-    color: white;
+  .event-card {
+    background-color: #2b2b2b;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    transition: 0.2s;
+    cursor: pointer;
+    border-left: 4px solid #4a90e2;
+  }
+  
+  .event-card:hover {
+    background-color: #333;
+  }
+  
+  .event-title {
+    font-size: 1rem;
+    font-weight: bold;
+  }
+  
+  .event-meta {
+    margin-top: 4px;
+    font-size: 0.85rem;
+    opacity: 0.8;
+    display: flex;
+    gap: 6px;
+  }
+  
+  .no-events {
+    opacity: 0.6;
+    font-size: 0.9rem;
   }
   
