@@ -42,12 +42,12 @@ function App() {
       {/* --- HEADER --- */}
       <header className="app-header">
         <h1>ClubSync – An Tóchar GAA</h1>
-
+        
         <button className="solver-btn" onClick={handleSolverRun}>
           Run Solver Check
         </button>
-
-        {solverStatus && (
+        
+                {solverStatus && (
           <h2 className={`solver-status ${solverStatus.includes("feasible") ? "ok" : "error"}`}>
             {solverStatus}
           </h2>
@@ -62,7 +62,7 @@ function App() {
           selectedFacility={selectedFacility}
           onSelectFacility={setSelectedFacility}
         />
-
+        
         <div className="calendar-wrapper">
           <CalendarView events={events} />
         </div>
