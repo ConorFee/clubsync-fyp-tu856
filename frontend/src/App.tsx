@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { EventType, FacilityType } from "./types/types";
+import type { EventType } from "./types/types";
 
 import { fetchEvents } from "./api/events";
 import { runSolverCheck } from "./api/solver";
@@ -22,7 +22,7 @@ function App() {
   useEffect(() => {
     fetchEvents()
       .then((data) => setEvents(data))
-      .catch((err) => console.error("Error loading events:", err));
+      .catch((err) => console.error("Error loading events:", err));  
   }, []);
 
   const handleRefreshEvents = () => {
