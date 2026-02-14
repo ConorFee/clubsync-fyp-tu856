@@ -1,0 +1,82 @@
+.sidenav {
+  width: 200px;
+  background-color: #0d2b5e;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: width 0.2s ease;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.sidenav-collapsed {
+  width: 60px;
+}
+
+.sidenav-items {
+  display: flex;
+  flex-direction: column;
+  padding-top: 8px;
+}
+
+.sidenav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.sidenav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.sidenav-link-active {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
+  border-left: 3px solid #4da3ff;
+}
+
+.sidenav-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+}
+
+.sidenav-label {
+  font-weight: 500;
+}
+
+.sidenav-toggle {
+  background: none;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  padding: 12px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  text-align: center;
+  transition: color 0.15s ease;
+}
+
+.sidenav-toggle:hover {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Collapsed adjustments */
+.sidenav-collapsed .sidenav-link {
+  justify-content: center;
+  padding: 14px 0;
+}
+
+.sidenav-collapsed .sidenav-link-active {
+  border-left: 3px solid #4da3ff;
+}
