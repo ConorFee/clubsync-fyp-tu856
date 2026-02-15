@@ -1,0 +1,137 @@
+.login-page {
+  min-height: 100vh;
+  background-color: #f0f2f5;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Top bar */
+.login-topbar {
+  background-color: #1a5fb4;
+  padding: 12px 24px;
+  color: white;
+}
+
+.login-logo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* Main content area */
+.login-content {
+  flex: 1;
+}
+
+/* Left side — form */
+.login-form-side {
+  background-color: #ffffff;
+  padding: 40px;
+}
+
+.login-form-container {
+  width: 100%;
+  max-width: 380px;
+}
+
+.login-heading {
+  color: #1a5fb4;
+  font-weight: 600;
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.input-icon-group {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.1rem;
+  opacity: 0.5;
+}
+
+.input-icon-group .form-control {
+  padding-left: 42px;
+  height: 48px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-size: 0.95rem;
+}
+
+.input-icon-group .form-control:focus {
+  border-color: #1a5fb4;
+  box-shadow: 0 0 0 0.2rem rgba(26, 95, 180, 0.15);
+}
+
+.btn-login {
+  background-color: #1a5fb4;
+  border-color: #1a5fb4;
+  height: 46px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 6px;
+  margin-top: 8px;
+}
+
+.btn-login:hover {
+  background-color: #154d94;
+  border-color: #154d94;
+}
+
+/* Right side — branding */
+.login-brand-side {
+  background: linear-gradient(135deg, #1a5fb4 0%, #0d3b7a 100%);
+  color: white;
+  padding: 40px;
+}
+
+.brand-title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+  letter-spacing: 1px;
+}
+
+.brand-tagline {
+  font-size: 1.3rem;
+  font-weight: 300;
+  margin-bottom: 12px;
+  opacity: 0.95;
+}
+
+.brand-subtitle {
+  font-size: 1rem;
+  opacity: 0.8;
+  max-width: 400px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Footer */
+.login-footer {
+  text-align: center;
+  padding: 12px;
+  color: #888;
+  font-size: 0.85rem;
+  background-color: #f0f2f5;
+}
+
+/* Responsive — stack on mobile */
+@media (max-width: 767px) {
+  .login-brand-side {
+    padding: 40px 20px;
+    min-height: 200px;
+  }
+
+  .brand-title {
+    font-size: 2rem;
+  }
+
+  .login-form-side {
+    padding: 30px 20px;
+  }
+}
