@@ -1,73 +1,26 @@
-import { useEffect, useState } from "react";
-import type { EventType } from "./types/types";
+import { Routes, Route } from 'react-router-dom';
 
-import { fetchEvents } from "./api/events";
-import { runSolverCheck } from "./api/solver";
-
-import CalendarView from "./components/CalendarView";
-import Sidebar from "./components/sidebar/Sidebar";
-
-import "./styles/App.css"; // <-- Make sure App.css contains layout styles
+import AuthenticatedLayout from './components/layout/AuthenticatedLayout';
+import LoginPage from './pages/LoginPage';
+import CalendarPage from './pages/CalendarPage';
+import BookingsPage from './pages/BookingsPage';
+import RequestsPage from './pages/RequestsPage';
+import TeamsPage from './pages/TeamsPage';
 
 function App() {
-  const [events, setEvents] = useState<EventType[]>([]);
-  const [solverStatus, setSolverStatus] = useState("");
-
-  const [selectedFacility, setSelectedFacility] = useState<string>("All");
-
-  const filteredEvents = events.filter(e =>
-    selectedFacility === "All" ? true : e.facility.name === selectedFacility
-  );
-  
-  useEffect(() => {
-    fetchEvents()
-      .then((data) => setEvents(data))
-      .catch((err) => console.error("Error loading events:", err));  
-  }, []);
-
-  const handleRefreshEvents = () => {
-    fetchEvents()
-      .then((data) => setEvents(data))
-      .catch((err) => console.error("Refresh error:", err));
-  };
-
-  const handleSolverRun = () => {
-    runSolverCheck()
-      .then((message) => setSolverStatus(message))
-      .catch(() => setSolverStatus("Solver error"));
-  };
-
   return (
-    <div className="app-container">
-      {/* --- HEADER --- */}
-      <header className="app-header">
-        <h1>ClubSync – An Tóchar GAA</h1>
-        
-        <button className="solver-btn" onClick={handleSolverRun}>
-          Run Solver Check
-        </button>
-        
-                {solverStatus && (
-          <h2 className={`solver-status ${solverStatus.includes("feasible") ? "ok" : "error"}`}>
-            {solverStatus}
-          </h2>
-        )}
-      </header>
+    <Routes>
+      {/* Public route */}
+      <Route path="/" element={<LoginPage />} />
 
-      {/* --- MAIN LAYOUT (Sidebar + Calendar) --- */}
-      <div className="main-layout">
-        <Sidebar 
-          onRefresh={handleRefreshEvents} 
-          events={filteredEvents}
-          selectedFacility={selectedFacility}
-          onSelectFacility={setSelectedFacility}
-        />
-        
-        <div className="calendar-wrapper">
-          <CalendarView events={events} />
-        </div>
-      </div>
-    </div>
+      {/* Protected routes — wrapped in app shell */}
+      <Route element={<AuthenticatedLayout />}>
+        <Route path="/calendar" element={<CalendarPage />} />
+        <Route path="/bookings" element={<BookingsPage />} />
+        <Route path="/requests" element={<RequestsPage />} />
+        <Route path="/teams" element={<TeamsPage />} />
+      </Route>
+    </Routes>
   );
 }
 

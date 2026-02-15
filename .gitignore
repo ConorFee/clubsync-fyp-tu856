@@ -22,3 +22,10 @@ db.sqlite3
 
 CLAUDE.md
 docs/scheduler_design.md
+docs/UI_design.md
+docs/eventFormModal.md
+docs/manual_test_cases.md
+docs/meeting_logs.md
+docs/modal_app_integration.md
+docs/page_layout.md
+
