@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { EventType, FacilityType } from '../types/types';
 
-import { fetchEvents } from '../api/events';
+import { fetchEvents, deleteEvent } from '../api/events';
 import { fetchFacilities } from '../api/facilities';
 import { runSolverCheck } from '../api/solver';
 
@@ -52,8 +52,23 @@ export default function CalendarPage() {
     setIsModalOpen(true);
   };
 
-  // handleEditEvent and handleDeleteEvent will be added in Tasks 4-5
-  // (calendar click handler + sidebar buttons)
+  const handleEditEvent = (event: EventType) => {
+    setSelectedEvent(event);
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteEvent = async (id: number) => {
+    if (window.confirm('Are you sure you want to delete this event?')) {
+      try {
+        await deleteEvent(id);
+        const data = await fetchEvents();
+        setEvents(data);
+      } catch (err) {
+        console.error('Failed to delete event:', err);
+        alert('Failed to delete event. Please try again.');
+      }
+    }
+  };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -96,10 +111,12 @@ export default function CalendarPage() {
           events={filteredEvents}
           selectedFacility={selectedFacility}
           onSelectFacility={setSelectedFacility}
+          onEditEvent={handleEditEvent}
+          onDeleteEvent={handleDeleteEvent}
         />
 
         <div className="calendar-wrapper">
-          <CalendarView events={events} />
+          <CalendarView events={events} onEventClick={handleEditEvent} />
         </div>
       </div>
 
