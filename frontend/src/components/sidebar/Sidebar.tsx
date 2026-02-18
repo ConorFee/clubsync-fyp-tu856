@@ -6,6 +6,8 @@ interface SidebarProps {
   events: EventType[];
   selectedFacility: string;
   onSelectFacility: (name: string) => void;
+  onEditEvent?: (event: EventType) => void;
+  onDeleteEvent?: (id: number) => void;
 }
 
 export default function Sidebar({
@@ -13,6 +15,8 @@ export default function Sidebar({
   events,
   selectedFacility,
   onSelectFacility,
+  onEditEvent,
+  onDeleteEvent,
 }: SidebarProps) {
   
   const facilityOptions = ["All", "Main Pitch", "Training Pitch", "Hall", "Gym"];
@@ -55,6 +59,25 @@ export default function Sidebar({
               <span>{ev.is_fixed ? "Fixed" : "Scheduled"}</span>
               <span>•</span>
               <span>{ev.facility.name}</span>
+            </div>
+
+            <div className="event-actions">
+              {onEditEvent && (
+                <button
+                  className="btn btn-outline-primary btn-sm"
+                  onClick={() => onEditEvent(ev)}
+                >
+                  Edit
+                </button>
+              )}
+              {onDeleteEvent && (
+                <button
+                  className="btn btn-outline-danger btn-sm"
+                  onClick={() => onDeleteEvent(ev.id)}
+                >
+                  Delete
+                </button>
+              )}
             </div>
           </div>
         ))}
