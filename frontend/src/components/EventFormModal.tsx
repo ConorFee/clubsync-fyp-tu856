@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { createEvent, updateEvent } from "../api/events";
-import type { EventType, FacilityType, CreateEventPayload } from "../types/types";
+import type { EventType, FacilityType, CreateEventPayload, EventTypeChoice } from "../types/types";
+import { EVENT_TYPE_LABELS, EVENT_TYPE_DURATIONS } from "../types/types";
 import "./EventFormModal.css";
 
 interface EventFormModalProps {
@@ -13,6 +14,7 @@ interface EventFormModalProps {
 
 // Initial empty form state
 const initialFormData = {
+  eventType: "other" as EventTypeChoice,
   title: "",
   facility: "",
   startDate: new Date().toISOString().split("T")[0], // Today's date
@@ -44,6 +46,7 @@ export default function EventFormModal({
       const endDate = new Date(event.end_time);
 
       setFormData({
+        eventType: event.event_type || "other",
         title: event.title,
         facility: event.facility.name, // Extract name from facility object
         startDate: startDate.toISOString().split("T")[0],
@@ -85,6 +88,22 @@ export default function EventFormModal({
     return true;
   };
 
+  // Auto-fill end time when event type changes
+  const handleEventTypeChange = (type: EventTypeChoice) => {
+    const duration = EVENT_TYPE_DURATIONS[type];
+    if (duration && formData.startTime) {
+      const [hours, mins] = formData.startTime.split(":").map(Number);
+      const startMinutes = hours * 60 + mins;
+      const endMinutes = startMinutes + duration;
+      const endHours = Math.floor(endMinutes / 60) % 24;
+      const endMins = endMinutes % 60;
+      const endTime = `${String(endHours).padStart(2, "0")}:${String(endMins).padStart(2, "0")}`;
+      setFormData({ ...formData, eventType: type, endTime, endDate: formData.startDate });
+    } else {
+      setFormData({ ...formData, eventType: type });
+    }
+  };
+
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,6 +124,7 @@ export default function EventFormModal({
       facility: formData.facility, // Facility NAME (not ID)
       is_fixed: formData.isFixed,
       team_name: formData.teamName || undefined,
+      event_type: formData.eventType,
     };
 
     setLoading(true);
@@ -162,6 +182,27 @@ export default function EventFormModal({
 
         {/* Form */}
         <form onSubmit={handleSubmit}>
+          {/* Event Type */}
+          <div className="form-group">
+            <label htmlFor="eventType">
+              Event Type <span className="required">*</span>
+            </label>
+            <select
+              id="eventType"
+              value={formData.eventType}
+              onChange={(e) => handleEventTypeChange(e.target.value as EventTypeChoice)}
+            >
+              {Object.entries(EVENT_TYPE_LABELS).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                  {EVENT_TYPE_DURATIONS[value as EventTypeChoice]
+                    ? ` (${EVENT_TYPE_DURATIONS[value as EventTypeChoice]} min)`
+                    : ""}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* Title */}
           <div className="form-group">
             <label htmlFor="title">
