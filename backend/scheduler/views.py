@@ -1,8 +1,8 @@
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Facility, Event, Team
-from .serializers import FacilitySerializer, EventSerializer, TeamSerializer
+from .models import Facility, Event, Team, BookingRequest
+from .serializers import FacilitySerializer, EventSerializer, TeamSerializer, BookingRequestSerializer
 from ortools.sat.python import cp_model
 import datetime
 
@@ -14,6 +14,10 @@ class FacilityViewSet(viewsets.ReadOnlyModelViewSet):
 class TeamViewSet(viewsets.ModelViewSet):
     queryset = Team.objects.all()
     serializer_class = TeamSerializer
+
+class BookingRequestViewSet(viewsets.ModelViewSet):
+    queryset = BookingRequest.objects.all().order_by('-created_at')
+    serializer_class = BookingRequestSerializer
 
 class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all().order_by('start_time')

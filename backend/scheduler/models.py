@@ -119,3 +119,110 @@ class Event(models.Model):
 
     class Meta:
         ordering = ['start_time']
+
+
+class BookingRequest(models.Model):
+    PRIORITY_CHOICES = [
+        (1, 'Low'),
+        (2, 'Medium'),
+        (3, 'High'),
+    ]
+
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('scheduled', 'Scheduled'),
+        ('partial', 'Partially Scheduled'),
+        ('rejected', 'Rejected'),
+    ]
+
+    RECURRENCE_CHOICES = [
+        ('once', 'One-time'),
+        ('weekly', 'Weekly'),
+    ]
+
+    DAY_CHOICES = [
+        ('monday', 'Monday'),
+        ('tuesday', 'Tuesday'),
+        ('wednesday', 'Wednesday'),
+        ('thursday', 'Thursday'),
+        ('friday', 'Friday'),
+        ('saturday', 'Saturday'),
+        ('sunday', 'Sunday'),
+    ]
+
+    # Who is requesting
+    team = models.ForeignKey(
+        Team,
+        on_delete=models.CASCADE,
+        related_name='booking_requests',
+    )
+
+    # What they need
+    title = models.CharField(max_length=200)
+    event_type = models.CharField(
+        max_length=30,
+        choices=EVENT_TYPE_CHOICES,
+        default='other',
+    )
+    duration_minutes = models.IntegerField(
+        help_text="Duration in minutes",
+    )
+    recurrence = models.CharField(
+        max_length=20,
+        choices=RECURRENCE_CHOICES,
+        default='weekly',
+    )
+
+    # Soft constraints (coach preferences — fed into the solver)
+    preferred_facility = models.ForeignKey(
+        Facility,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='booking_requests',
+        help_text="Leave blank for any suitable facility",
+    )
+    preferred_days = models.JSONField(
+        default=list,
+        help_text="e.g. ['tuesday', 'thursday']",
+    )
+    preferred_time_start = models.TimeField(
+        help_text="Earliest acceptable start time",
+    )
+    preferred_time_end = models.TimeField(
+        help_text="Latest acceptable end time",
+    )
+    priority = models.IntegerField(
+        choices=PRIORITY_CHOICES,
+        default=2,
+    )
+
+    # Scheduling period
+    schedule_from = models.DateField()
+    schedule_until = models.DateField()
+
+    # Status
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending',
+    )
+
+    # Result — populated by solver after schedule is generated
+    scheduled_event = models.ForeignKey(
+        Event,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='source_request',
+    )
+    rejection_reason = models.TextField(blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.team.name} — {self.title} ({self.get_status_display()})"
+
+    class Meta:
+        ordering = ['-created_at']

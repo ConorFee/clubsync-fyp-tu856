@@ -1,6 +1,6 @@
 # scheduler/admin.py
 from django.contrib import admin
-from .models import Facility, Event, Team
+from .models import Facility, Event, Team, BookingRequest
 
 
 @admin.register(Facility)
@@ -21,3 +21,11 @@ class EventAdmin(admin.ModelAdmin):
     list_display = ('title', 'facility', 'start_time', 'end_time', 'event_type', 'status', 'is_fixed', 'team_name')
     list_filter = ('facility', 'is_fixed', 'event_type', 'status')
     search_fields = ('title', 'team_name')
+
+
+@admin.register(BookingRequest)
+class BookingRequestAdmin(admin.ModelAdmin):
+    list_display = ('title', 'team', 'event_type', 'duration_minutes', 'recurrence', 'priority', 'status', 'created_at')
+    list_filter = ('status', 'priority', 'event_type', 'recurrence')
+    search_fields = ('title', 'team__name')
+    readonly_fields = ('created_at', 'updated_at')
