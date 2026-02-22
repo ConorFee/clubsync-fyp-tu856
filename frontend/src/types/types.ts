@@ -57,6 +57,45 @@ export interface EventType {
     team: string | null;
 }
 
+export interface BookingRequestType {
+    id: number;
+    team: string;                       // team name (slug from API)
+    team_name: string;                  // read-only display name
+    title: string;
+    event_type: EventTypeChoice;
+    duration_minutes: number;
+    recurrence: 'once' | 'weekly';
+    preferred_facility: string | null;  // facility name or null
+    preferred_days: string[];           // e.g. ['tuesday', 'thursday']
+    preferred_time_start: string;       // HH:MM
+    preferred_time_end: string;         // HH:MM
+    priority: 1 | 2 | 3;
+    priority_display: string;           // 'Low' | 'Medium' | 'High'
+    status: 'pending' | 'scheduled' | 'partial' | 'rejected';
+    status_display: string;
+    schedule_from: string;              // YYYY-MM-DD
+    schedule_until: string;             // YYYY-MM-DD
+    scheduled_event: number | null;
+    rejection_reason: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface CreateBookingRequestPayload {
+    team: string;                       // team name
+    title: string;
+    event_type: EventTypeChoice;
+    duration_minutes: number;
+    recurrence: 'once' | 'weekly';
+    preferred_facility?: string | null; // facility name or null
+    preferred_days: string[];
+    preferred_time_start: string;       // HH:MM
+    preferred_time_end: string;         // HH:MM
+    priority: 1 | 2 | 3;
+    schedule_from: string;              // YYYY-MM-DD
+    schedule_until: string;             // YYYY-MM-DD
+}
+
 // Payload for creating/updating events (what we send to API)
 export interface CreateEventPayload {
     title: string;
