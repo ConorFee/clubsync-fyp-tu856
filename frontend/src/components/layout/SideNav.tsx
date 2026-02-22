@@ -12,7 +12,6 @@ interface NavItem {
 const navItems: NavItem[] = [
   { path: '/calendar', label: 'Calendar', icon: '📅' },
   { path: '/bookings', label: 'Bookings', icon: '📝' },
-  { path: '/requests', label: 'Requests', icon: '📋', adminOnly: true },
   { path: '/teams', label: 'Teams', icon: '👥', adminOnly: true },
 ];
 

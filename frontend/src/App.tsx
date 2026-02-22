@@ -4,7 +4,7 @@ import AuthenticatedLayout from './components/layout/AuthenticatedLayout';
 import LoginPage from './pages/LoginPage';
 import CalendarPage from './pages/CalendarPage';
 import BookingsPage from './pages/BookingsPage';
-import RequestsPage from './pages/RequestsPage';
+import BookingRequestForm from './components/BookingRequestForm';
 import TeamsPage from './pages/TeamsPage';
 
 function App() {
@@ -17,7 +17,8 @@ function App() {
       <Route element={<AuthenticatedLayout />}>
         <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/bookings" element={<BookingsPage />} />
-        <Route path="/requests" element={<RequestsPage />} />
+        <Route path="/bookings/new" element={<BookingRequestForm />} />
+        <Route path="/bookings/:id" element={<BookingRequestForm />} />
         <Route path="/teams" element={<TeamsPage />} />
       </Route>
     </Routes>
