@@ -1,0 +1,190 @@
+/* BookingsPage.css */
+
+.bp-page {
+  padding: 28px 32px;
+  max-width: 1200px;
+}
+
+/* ── Header ── */
+.bp-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.bp-title {
+  margin: 0 0 4px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.bp-subtitle {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.bp-btn-new {
+  padding: 10px 20px;
+  background: #1a73e8;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.bp-btn-new:hover {
+  background: #1558b0;
+}
+
+/* ── States ── */
+.bp-state {
+  color: #555;
+  font-size: 0.95rem;
+  padding: 12px 0;
+}
+
+.bp-state--error {
+  color: #c0392b;
+}
+
+.bp-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #888;
+}
+
+.bp-empty-icon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+}
+
+.bp-empty p {
+  margin: 4px 0;
+  font-size: 0.95rem;
+}
+
+/* ── Table ── */
+.bp-table-wrap {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.bp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  background: #fff;
+}
+
+.bp-table thead th {
+  background: #f5f5f5;
+  color: #444;
+  font-weight: 600;
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+  white-space: nowrap;
+}
+
+.bp-table tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.1s;
+}
+
+.bp-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.bp-table tbody tr:hover {
+  background: #f0f7ff;
+  box-shadow: inset 3px 0 0 #1a73e8;
+}
+
+.bp-table td {
+  padding: 11px 14px;
+  vertical-align: middle;
+  color: #333;
+}
+
+.bp-cell-team {
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+.bp-cell-title {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bp-link-title {
+  color: #1a73e8;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.bp-link-title:hover {
+  text-decoration: underline;
+}
+
+.bp-cell-recurrence {
+  white-space: nowrap;
+}
+
+/* ── Status badges ── */
+.bp-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.bp-badge--pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.bp-badge--scheduled {
+  background: #d1e7dd;
+  color: #0a5c36;
+}
+
+.bp-badge--partial {
+  background: #cff4fc;
+  color: #0c5460;
+}
+
+.bp-badge--rejected {
+  background: #f8d7da;
+  color: #842029;
+}
+
+/* ── Row actions ── */
+.bp-btn-delete {
+  padding: 5px 12px;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border: 1px solid #f5c6c6;
+  background: #fff0f0;
+  color: #c0392b;
+  transition: background 0.15s;
+}
+
+.bp-btn-delete:hover {
+  background: #ffe0e0;
+}
