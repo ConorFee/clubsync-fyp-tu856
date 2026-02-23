@@ -1,0 +1,290 @@
+/* BookingRequestForm.css — inline full-page form (replaces modal) */
+
+.brf-page {
+  padding: 28px 32px;
+  max-width: 860px;
+}
+
+/* ── Breadcrumb ── */
+.brf-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+  font-size: 0.85rem;
+}
+
+.brf-breadcrumb-link {
+  color: #1a73e8;
+  text-decoration: none;
+}
+
+.brf-breadcrumb-link:hover {
+  text-decoration: underline;
+}
+
+.brf-breadcrumb-sep {
+  color: #bbb;
+}
+
+.brf-breadcrumb-current {
+  color: #666;
+}
+
+/* ── Page title ── */
+.brf-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 24px;
+}
+
+/* ── Form card ── */
+.brf-card {
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  padding: 28px 32px;
+}
+
+/* ── Section labels ── */
+.brf-section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 20px;
+  margin-top: 28px;
+}
+
+.brf-section-label:first-of-type {
+  margin-top: 0;
+}
+
+/* ── Two-column grid ── */
+.brf-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.brf-grid-2 .brf-field {
+  margin-bottom: 0;
+}
+
+/* ── Fields ── */
+.brf-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.brf-field label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.brf-req {
+  color: #e53935;
+}
+
+.brf-field select,
+.brf-field input[type="text"],
+.brf-field input[type="number"],
+.brf-field input[type="time"],
+.brf-field input[type="date"] {
+  padding: 8px 10px;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #333;
+  background: #fff;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.brf-field select:focus,
+.brf-field input:focus {
+  outline: none;
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.08);
+}
+
+.brf-field select:disabled {
+  background: #f5f5f5;
+  color: #aaa;
+}
+
+/* ── Checkbox ── */
+.brf-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: #555;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+/* ── Radio group ── */
+.brf-radio-group {
+  display: flex;
+  gap: 24px;
+}
+
+.brf-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #333;
+  cursor: pointer;
+}
+
+/* ── Day toggle buttons ── */
+.brf-days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.brf-day-btn {
+  padding: 7px 16px;
+  border: 1.5px solid #d0d0d0;
+  border-radius: 20px;
+  background: #fff;
+  color: #555;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.brf-day-btn:hover {
+  border-color: #1a73e8;
+  color: #1a73e8;
+}
+
+.brf-day-btn--active {
+  background: #1a73e8;
+  border-color: #1a73e8;
+  color: #fff;
+}
+
+.brf-day-btn--active:hover {
+  background: #1558b0;
+  border-color: #1558b0;
+}
+
+/* ── Error banner ── */
+.brf-error {
+  background: #fff3f3;
+  border: 1px solid #f5c6c6;
+  color: #c0392b;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+/* ── Action buttons ── */
+.brf-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 24px;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 12px;
+}
+
+.brf-btn-cancel {
+  padding: 9px 22px;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  background: #fff;
+  color: #555;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.brf-btn-cancel:hover {
+  background: #f5f5f5;
+}
+
+.brf-btn-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.brf-btn-submit {
+  padding: 9px 26px;
+  background: #1a73e8;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.brf-btn-submit:hover {
+  background: #1558b0;
+}
+
+.brf-btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Loading / error page states ── */
+.brf-state {
+  padding: 20px 0;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.brf-state--error {
+  color: #c0392b;
+}
+
+/* ── Mobile ── */
+@media (max-width: 640px) {
+  .brf-page {
+    padding: 20px 16px;
+  }
+
+  .brf-card {
+    padding: 20px 16px;
+  }
+
+  .brf-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .brf-radio-group {
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .brf-actions {
+    flex-direction: column-reverse;
+  }
+
+  .brf-btn-cancel,
+  .brf-btn-submit {
+    width: 100%;
+    text-align: center;
+  }
+}
