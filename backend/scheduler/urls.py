@@ -1,6 +1,9 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import FacilityViewSet, EventViewSet, TeamViewSet, BookingRequestViewSet, solve_schedule
+from .views import (
+    FacilityViewSet, EventViewSet, TeamViewSet, BookingRequestViewSet,
+    solve_schedule, generate_schedule, publish_schedule,
+)
 
 router = DefaultRouter()
 router.register('facilities', FacilityViewSet)
@@ -11,4 +14,6 @@ router.register('requests', BookingRequestViewSet)
 urlpatterns = [
     path('', include(router.urls)),
     path('schedule/solve/', solve_schedule, name='solve-schedule'),
+    path('schedule/generate/', generate_schedule, name='generate-schedule'),
+    path('schedule/publish/', publish_schedule, name='publish-schedule'),
 ]

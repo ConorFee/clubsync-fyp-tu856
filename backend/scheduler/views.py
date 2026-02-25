@@ -3,8 +3,9 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Facility, Event, Team, BookingRequest
 from .serializers import FacilitySerializer, EventSerializer, TeamSerializer, BookingRequestSerializer
+from .solver import solve_schedule as run_solver
 from ortools.sat.python import cp_model
-import datetime
+from datetime import date, datetime
 
 
 class FacilityViewSet(viewsets.ReadOnlyModelViewSet):
@@ -73,3 +74,108 @@ def solve_schedule(request):
             "message": "Conflicts detected — schedule not feasible",
             "non_fixed_events_checked": len(event_intervals)
         }, status=400)
+
+
+@api_view(['POST'])
+def generate_schedule(request):
+    """
+    Run the CP-SAT solver to generate a conflict-free schedule from pending BookingRequests.
+    Creates proposed Events and updates BookingRequest statuses.
+    """
+    date_from_str = request.data.get('date_from')
+    date_until_str = request.data.get('date_until')
+
+    if not date_from_str or not date_until_str:
+        return Response({'error': 'date_from and date_until are required.'}, status=400)
+
+    try:
+        date_from = date.fromisoformat(date_from_str)
+        date_until = date.fromisoformat(date_until_str)
+    except ValueError:
+        return Response({'error': 'Invalid date format. Use YYYY-MM-DD.'}, status=400)
+
+    if date_from > date_until:
+        return Response({'error': 'date_from must be before date_until.'}, status=400)
+
+    # Clean slate: delete existing proposed events in range (allows re-runs)
+    Event.objects.filter(
+        status='proposed',
+        start_time__date__gte=date_from,
+        start_time__date__lte=date_until,
+    ).delete()
+
+    # Reset any previously scheduled requests back to pending
+    BookingRequest.objects.filter(
+        status='scheduled',
+        schedule_from__lte=date_until,
+        schedule_until__gte=date_from,
+    ).update(status='pending')
+
+    # Run solver
+    result = run_solver(date_from, date_until)
+
+    if not result.success:
+        return Response({
+            'success': False,
+            'solver_status': result.status,
+            'solve_time_seconds': round(result.solve_time, 2),
+            'message': 'Could not find a valid schedule. Try reducing requests or relaxing constraints.',
+        })
+
+    # Bulk create proposed events (bypasses Event.save() overlap check — solver guarantees HC1)
+    new_events = [
+        Event(
+            title=ev['title'],
+            start_time=ev['start_time'],
+            end_time=ev['end_time'],
+            facility_id=ev['facility_id'],
+            team_id=ev['team_id'],
+            event_type=ev['event_type'],
+            status='proposed',
+            is_fixed=False,
+        )
+        for ev in result.events
+    ]
+    Event.objects.bulk_create(new_events)
+
+    # Update processed BookingRequests to 'scheduled'
+    if result.requests_processed:
+        BookingRequest.objects.filter(id__in=result.requests_processed).update(status='scheduled')
+
+    return Response({
+        'success': True,
+        'solver_status': result.status,
+        'solve_time_seconds': round(result.solve_time, 2),
+        'total_penalty': result.penalty,
+        'events_created': len(result.events),
+        'requests_processed': len(result.requests_processed),
+    })
+
+
+@api_view(['POST'])
+def publish_schedule(request):
+    """
+    Publish all proposed events in a date range — proposed → published.
+    """
+    date_from_str = request.data.get('date_from')
+    date_until_str = request.data.get('date_until')
+
+    if not date_from_str or not date_until_str:
+        return Response({'error': 'date_from and date_until are required.'}, status=400)
+
+    try:
+        date_from = date.fromisoformat(date_from_str)
+        date_until = date.fromisoformat(date_until_str)
+    except ValueError:
+        return Response({'error': 'Invalid date format. Use YYYY-MM-DD.'}, status=400)
+
+    count = Event.objects.filter(
+        status='proposed',
+        start_time__date__gte=date_from,
+        start_time__date__lte=date_until,
+    ).update(status='published')
+
+    return Response({
+        'success': True,
+        'events_published': count,
+    })
