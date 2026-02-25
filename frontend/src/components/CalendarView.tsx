@@ -10,6 +10,17 @@ interface CalendarViewProps {
   onEventClick?: (event: EventType) => void;
 }
 
+function getEventColor(e: EventType): string {
+  if (e.is_fixed) return '#c62828';       // Red — county fixtures
+  switch (e.status) {
+    case 'published': return '#2e7d32';   // Green — confirmed
+    case 'proposed':  return '#e65100';   // Orange — solver output, pending approval
+    case 'draft':     return '#757575';   // Grey — manual draft
+    case 'cancelled': return '#bdbdbd';   // Light grey
+    default:          return '#2e7d32';
+  }
+}
+
 export default function CalendarView({ events, onEventClick }: CalendarViewProps) {
   const handleEventClick = (info: EventClickArg) => {
     if (!onEventClick) return;
@@ -37,7 +48,8 @@ export default function CalendarView({ events, onEventClick }: CalendarViewProps
         title: `${e.title} – ${e.facility.name}`,
         start: e.start_time,
         end: e.end_time,
-        backgroundColor: e.is_fixed ? "#dc3545" : "#28a745",
+        backgroundColor: getEventColor(e),
+        borderColor: getEventColor(e),
         textColor: "white",
         extendedProps: { eventId: e.id },
       }))}

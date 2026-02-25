@@ -17,17 +17,129 @@
   font-weight: 600;
 }
 
-.solver-area {
+/* ── Solver Controls ── */
+.solver-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 14px 18px;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  flex-wrap: wrap;
+}
+
+.solver-dates {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.solver-date-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #666;
+}
+
+.solver-date-input {
+  padding: 7px 10px;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: #333;
+  transition: border-color 0.15s;
+}
+
+.solver-date-input:focus {
+  outline: none;
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.08);
+}
+
+.solver-buttons {
+  display: flex;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.solver-btn {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.solver-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.solver-btn--generate {
+  background: #e65100;
+  color: #fff;
+}
+
+.solver-btn--generate:hover:not(:disabled) {
+  background: #bf4400;
+}
+
+.solver-btn--publish {
+  background: #2e7d32;
+  color: #fff;
+}
+
+.solver-btn--publish:hover:not(:disabled) {
+  background: #256428;
+}
+
+/* ── Solver Result Banner ── */
+.solver-result-banner {
   display: flex;
   align-items: center;
-  gap: 12px;
-}
-
-.solver-status {
-  font-size: 0.9rem;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 0.875rem;
   font-weight: 500;
+  margin-bottom: 16px;
 }
 
+.solver-result--success {
+  background: #e8f5e9;
+  border: 1px solid #a5d6a7;
+  color: #2e7d32;
+}
+
+.solver-result--error {
+  background: #fff3f3;
+  border: 1px solid #f5c6c6;
+  color: #c62828;
+}
+
+.solver-result-dismiss {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: inherit;
+  padding: 0 4px;
+  line-height: 1;
+  opacity: 0.7;
+}
+
+.solver-result-dismiss:hover {
+  opacity: 1;
+}
+
+/* ── Calendar Layout ── */
 .calendar-layout {
   display: flex;
   gap: 16px;
@@ -42,4 +154,28 @@
   padding: 16px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   overflow: auto;
+}
+
+/* ── Colour Legend ── */
+.calendar-legend {
+  display: flex;
+  gap: 20px;
+  padding: 12px 0 4px;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 12px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
