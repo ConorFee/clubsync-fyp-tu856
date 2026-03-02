@@ -56,7 +56,13 @@ export default function Sidebar({
             <div className="event-title">{ev.title}</div>
 
             <div className="event-meta">
-              <span>{ev.is_fixed ? "Fixed" : "Scheduled"}</span>
+              <span className="event-status">
+                <span
+                  className="event-status-dot"
+                  style={{ background: ev.is_fixed ? '#c62828' : ev.status === 'published' ? '#2e7d32' : ev.status === 'proposed' ? '#e65100' : '#757575' }}
+                />
+                {ev.is_fixed ? 'Fixed' : ev.status.charAt(0).toUpperCase() + ev.status.slice(1)}
+              </span>
               <span>•</span>
               <span>{ev.facility.name}</span>
             </div>

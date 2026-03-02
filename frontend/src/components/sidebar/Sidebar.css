@@ -114,6 +114,20 @@
   display: flex;
   gap: 5px;
   flex-wrap: wrap;
+  align-items: center;
+}
+
+.event-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.event-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 /* ── Action buttons ── */
