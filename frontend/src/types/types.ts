@@ -67,6 +67,7 @@ export interface BookingRequestType {
     recurrence: 'once' | 'weekly';
     preferred_facility: string | null;  // facility name or null
     preferred_days: string[];           // e.g. ['tuesday', 'thursday']
+    target_date: string | null;         // YYYY-MM-DD for one-time events, null for weekly
     preferred_time_start: string;       // HH:MM
     preferred_time_end: string;         // HH:MM
     priority: 1 | 2 | 3;
@@ -89,9 +90,10 @@ export interface CreateBookingRequestPayload {
     recurrence: 'once' | 'weekly';
     preferred_facility?: string | null; // facility name or null
     preferred_days: string[];
+    target_date?: string | null;        // YYYY-MM-DD for one-time events
     preferred_time_start: string;       // HH:MM
     preferred_time_end: string;         // HH:MM
-    priority: 1 | 2 | 3;
+    priority?: 1 | 2 | 3;              // auto-derived from event_type on backend
     schedule_from: string;              // YYYY-MM-DD
     schedule_until: string;             // YYYY-MM-DD
 }

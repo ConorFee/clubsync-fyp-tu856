@@ -41,9 +41,9 @@ const initialFormData = {
   preferredFacility: "",
   anyFacility: false,
   preferredDays: [] as string[],
+  targetDate: "",
   preferredTimeStart: "18:00",
   preferredTimeEnd: "20:00",
-  priority: 2 as 1 | 2 | 3,
   scheduleFrom: today,
   scheduleUntil: nextMonth,
 };
@@ -79,9 +79,9 @@ export default function BookingRequestForm() {
             preferredFacility: req.preferred_facility || "",
             anyFacility: !req.preferred_facility,
             preferredDays: req.preferred_days,
+            targetDate: req.target_date || "",
             preferredTimeStart: req.preferred_time_start,
             preferredTimeEnd: req.preferred_time_end,
-            priority: req.priority,
             scheduleFrom: req.schedule_from,
             scheduleUntil: req.schedule_until,
           });
@@ -122,21 +122,39 @@ export default function BookingRequestForm() {
     if (formData.durationMinutes <= 0) {
       setError("Duration must be greater than 0"); return false;
     }
-    if (formData.preferredDays.length === 0) {
-      setError("Please select at least one preferred day"); return false;
+
+    if (formData.recurrence === "weekly") {
+      if (formData.preferredDays.length === 0) {
+        setError("Please select at least one training day"); return false;
+      }
+      if (!formData.scheduleFrom || !formData.scheduleUntil) {
+        setError("Please set a schedule period"); return false;
+      }
+      if (formData.scheduleFrom > formData.scheduleUntil) {
+        setError("Schedule end date must be after start date"); return false;
+      }
+    } else {
+      if (!formData.targetDate) {
+        setError("Please select an event date"); return false;
+      }
     }
+
     if (!formData.preferredTimeStart || !formData.preferredTimeEnd) {
       setError("Please set a preferred time window"); return false;
     }
     if (formData.preferredTimeStart >= formData.preferredTimeEnd) {
       setError("Preferred end time must be after start time"); return false;
     }
-    if (!formData.scheduleFrom || !formData.scheduleUntil) {
-      setError("Please set a schedule period"); return false;
+
+    // Time window vs duration check
+    const [sh, sm] = formData.preferredTimeStart.split(":").map(Number);
+    const [eh, em] = formData.preferredTimeEnd.split(":").map(Number);
+    const windowMinutes = (eh * 60 + em) - (sh * 60 + sm);
+    if (windowMinutes < formData.durationMinutes) {
+      setError(`Time window (${windowMinutes} min) is shorter than the requested duration (${formData.durationMinutes} min)`);
+      return false;
     }
-    if (formData.scheduleFrom > formData.scheduleUntil) {
-      setError("Schedule end date must be after start date"); return false;
-    }
+
     return true;
   };
 
@@ -152,12 +170,21 @@ export default function BookingRequestForm() {
       duration_minutes: formData.durationMinutes,
       recurrence: formData.recurrence,
       preferred_facility: formData.anyFacility ? null : formData.preferredFacility || null,
-      preferred_days: formData.preferredDays,
       preferred_time_start: formData.preferredTimeStart,
       preferred_time_end: formData.preferredTimeEnd,
-      priority: formData.priority,
-      schedule_from: formData.scheduleFrom,
-      schedule_until: formData.scheduleUntil,
+      ...(formData.recurrence === "weekly"
+        ? {
+            preferred_days: formData.preferredDays,
+            target_date: null,
+            schedule_from: formData.scheduleFrom,
+            schedule_until: formData.scheduleUntil,
+          }
+        : {
+            preferred_days: [],
+            target_date: formData.targetDate,
+            schedule_from: formData.targetDate,
+            schedule_until: formData.targetDate,
+          }),
     };
 
     setSaving(true);
@@ -290,9 +317,16 @@ export default function BookingRequestForm() {
                       name="recurrence"
                       value={opt.value}
                       checked={formData.recurrence === opt.value}
-                      onChange={() =>
-                        setFormData({ ...formData, recurrence: opt.value as "once" | "weekly" })
-                      }
+                      onChange={() => {
+                        const r = opt.value as "once" | "weekly";
+                        setFormData({
+                          ...formData,
+                          recurrence: r,
+                          ...(r === "once"
+                            ? { preferredDays: [], targetDate: "" }
+                            : { targetDate: "" }),
+                        });
+                      }}
                     />
                     {opt.label}
                   </label>
@@ -331,23 +365,35 @@ export default function BookingRequestForm() {
             </label>
           </div>
 
-          <div className="brf-field">
-            <label>Preferred Days <span className="brf-req">*</span></label>
-            <div className="brf-days">
-              {DAYS.map((d) => (
-                <button
-                  key={d.value}
-                  type="button"
-                  className={`brf-day-btn ${
-                    formData.preferredDays.includes(d.value) ? "brf-day-btn--active" : ""
-                  }`}
-                  onClick={() => toggleDay(d.value)}
-                >
-                  {d.label}
-                </button>
-              ))}
+          {formData.recurrence === "weekly" ? (
+            <div className="brf-field">
+              <label>Training Days <span className="brf-req">*</span></label>
+              <div className="brf-days">
+                {DAYS.map((d) => (
+                  <button
+                    key={d.value}
+                    type="button"
+                    className={`brf-day-btn ${
+                      formData.preferredDays.includes(d.value) ? "brf-day-btn--active" : ""
+                    }`}
+                    onClick={() => toggleDay(d.value)}
+                  >
+                    {d.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="brf-field">
+              <label htmlFor="brf-target-date">Event Date <span className="brf-req">*</span></label>
+              <input
+                id="brf-target-date"
+                type="date"
+                value={formData.targetDate}
+                onChange={(e) => setFormData({ ...formData, targetDate: e.target.value })}
+              />
+            </div>
+          )}
 
           <div className="brf-grid-2">
             <div className="brf-field">
@@ -374,53 +420,33 @@ export default function BookingRequestForm() {
             </div>
           </div>
 
-          <div className="brf-field">
-            <label>Priority</label>
-            <div className="brf-radio-group">
-              {[
-                { value: 1, label: "Low" },
-                { value: 2, label: "Medium" },
-                { value: 3, label: "High" },
-              ].map((opt) => (
-                <label key={opt.value} className="brf-radio-label">
+          {/* ── Section: Schedule Period (weekly only) ── */}
+          {formData.recurrence === "weekly" && (
+            <>
+              <div className="brf-section-label">Schedule Period</div>
+
+              <div className="brf-grid-2">
+                <div className="brf-field">
+                  <label htmlFor="brf-from">From <span className="brf-req">*</span></label>
                   <input
-                    type="radio"
-                    name="priority"
-                    value={opt.value}
-                    checked={formData.priority === opt.value}
-                    onChange={() =>
-                      setFormData({ ...formData, priority: opt.value as 1 | 2 | 3 })
-                    }
+                    id="brf-from"
+                    type="date"
+                    value={formData.scheduleFrom}
+                    onChange={(e) => setFormData({ ...formData, scheduleFrom: e.target.value })}
                   />
-                  {opt.label}
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* ── Section: Schedule Period ── */}
-          <div className="brf-section-label">Schedule Period</div>
-
-          <div className="brf-grid-2">
-            <div className="brf-field">
-              <label htmlFor="brf-from">From <span className="brf-req">*</span></label>
-              <input
-                id="brf-from"
-                type="date"
-                value={formData.scheduleFrom}
-                onChange={(e) => setFormData({ ...formData, scheduleFrom: e.target.value })}
-              />
-            </div>
-            <div className="brf-field">
-              <label htmlFor="brf-until">Until <span className="brf-req">*</span></label>
-              <input
-                id="brf-until"
-                type="date"
-                value={formData.scheduleUntil}
-                onChange={(e) => setFormData({ ...formData, scheduleUntil: e.target.value })}
-              />
-            </div>
-          </div>
+                </div>
+                <div className="brf-field">
+                  <label htmlFor="brf-until">Until <span className="brf-req">*</span></label>
+                  <input
+                    id="brf-until"
+                    type="date"
+                    value={formData.scheduleUntil}
+                    onChange={(e) => setFormData({ ...formData, scheduleUntil: e.target.value })}
+                  />
+                </div>
+              </div>
+            </>
+          )}
 
           {/* ── Error ── */}
           {error && (

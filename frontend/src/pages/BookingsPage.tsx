@@ -100,7 +100,7 @@ export default function BookingsPage() {
                 <th>Type</th>
                 <th>Duration</th>
                 <th>Recurrence</th>
-                <th>Preferred Days</th>
+                <th>Days / Date</th>
                 <th>Priority</th>
                 <th>Status</th>
                 <th>Actions</th>
@@ -125,7 +125,13 @@ export default function BookingsPage() {
                     <td className="bp-cell-recurrence">
                       {req.recurrence === "weekly" ? "Weekly" : "One-time"}
                     </td>
-                    <td>{formatDays(req.preferred_days)}</td>
+                    <td>
+                      {req.recurrence === "once" && req.target_date
+                        ? new Date(req.target_date + "T00:00").toLocaleDateString("en-IE", {
+                            weekday: "short", day: "numeric", month: "short",
+                          })
+                        : formatDays(req.preferred_days)}
+                    </td>
                     <td>{PRIORITY_LABELS[req.priority] ?? req.priority}</td>
                     <td>
                       <span className={`bp-badge ${statusCfg.className}`}>
