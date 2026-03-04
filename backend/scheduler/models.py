@@ -26,6 +26,16 @@ EVENT_TYPE_DURATIONS = {
     'other': None,
 }
 
+EVENT_TYPE_PRIORITIES = {
+    'championship': 3,
+    'match': 3,
+    'adult_training': 2,
+    'juvenile_training': 2,
+    'gym_session': 1,
+    'meeting': 1,
+    'other': 1,
+}
+
 
 # --- Models ---
 
@@ -33,7 +43,12 @@ class Facility(models.Model):
     name = models.CharField(max_length=100, unique=True)
     type = models.CharField(
         max_length=20,
-        choices=[('pitch', 'Pitch'), ('hall', 'Hall'), ('gym', 'Gym')],
+        choices=[('pitch', 'Pitch'), ('hall', 'Hall'), ('gym', 'Gym'), ('clubhouse', 'Clubhouse')],
+    )
+    suitable_for = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="Event types this facility can host, e.g. ['match', 'adult_training']. Empty = all types.",
     )
     class Meta:
         verbose_name_plural = 'facilities'
@@ -185,6 +200,11 @@ class BookingRequest(models.Model):
     preferred_days = models.JSONField(
         default=list,
         help_text="e.g. ['tuesday', 'thursday']",
+    )
+    target_date = models.DateField(
+        null=True,
+        blank=True,
+        help_text="Specific date for one-time events",
     )
     preferred_time_start = models.TimeField(
         help_text="Earliest acceptable start time",
