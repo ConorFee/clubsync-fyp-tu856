@@ -4,11 +4,12 @@ import type { GenerateResult } from '../api/solver';
 
 import { fetchEvents, deleteEvent } from '../api/events';
 import { fetchFacilities } from '../api/facilities';
-import { generateSchedule, publishSchedule } from '../api/solver';
+import { generateSchedule, publishSchedule, discardSchedule } from '../api/solver';
 
 import CalendarView from '../components/CalendarView';
 import Sidebar from '../components/sidebar/Sidebar';
 import EventFormModal from '../components/EventFormModal';
+import SolverReviewPanel from '../components/SolverReviewPanel';
 
 import './CalendarPage.css';
 
@@ -26,6 +27,7 @@ export default function CalendarPage() {
   const [dateUntil, setDateUntil] = useState('');
   const [generating, setGenerating] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [discarding, setDiscarding] = useState(false);
   const [solverResult, setSolverResult] = useState<GenerateResult | null>(null);
 
   const filteredEvents = events.filter((e) =>
@@ -79,6 +81,21 @@ export default function CalendarPage() {
       console.error('Publish error:', err);
     } finally {
       setPublishing(false);
+    }
+  };
+
+  const handleDiscard = async () => {
+    if (!dateFrom || !dateUntil) return;
+    if (!window.confirm('Discard the proposed schedule? This will delete all proposed events and reset requests to pending.')) return;
+    setDiscarding(true);
+    try {
+      await discardSchedule(dateFrom, dateUntil);
+      setSolverResult(null);
+      refreshEvents();
+    } catch (err) {
+      console.error('Discard error:', err);
+    } finally {
+      setDiscarding(false);
     }
   };
 
@@ -154,13 +171,22 @@ export default function CalendarPage() {
             {generating ? 'Generating...' : 'Generate Schedule'}
           </button>
           {hasProposedEvents && (
-            <button
-              className="solver-btn solver-btn--publish"
-              onClick={handlePublish}
-              disabled={publishing}
-            >
-              {publishing ? 'Publishing...' : 'Publish Schedule'}
-            </button>
+            <>
+              <button
+                className="solver-btn solver-btn--discard"
+                onClick={handleDiscard}
+                disabled={discarding}
+              >
+                {discarding ? 'Discarding...' : 'Discard'}
+              </button>
+              <button
+                className="solver-btn solver-btn--publish"
+                onClick={handlePublish}
+                disabled={publishing}
+              >
+                {publishing ? 'Publishing...' : 'Publish Schedule'}
+              </button>
+            </>
           )}
         </div>
       </div>
@@ -178,6 +204,15 @@ export default function CalendarPage() {
             &times;
           </button>
         </div>
+      )}
+
+      {/* Solver review panel */}
+      {solverResult?.success && solverResult.schedule_diff && solverResult.schedule_diff.length > 0 && (
+        <SolverReviewPanel
+          diff={solverResult.schedule_diff}
+          onDiscard={handleDiscard}
+          discarding={discarding}
+        />
       )}
 
       {/* Main layout — Sidebar + Calendar */}
