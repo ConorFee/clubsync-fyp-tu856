@@ -10,8 +10,9 @@ from ortools.sat.python import cp_model
 from .models import Facility, Team, Event, BookingRequest
 
 # ── Constants ──
-CHANGEOVER_BUFFER = 15     # minutes between events on the same facility
+WARMUP_BUFFER = 15         # minutes before match/championship for team warmup on pitch
 SOLVER_TIMEOUT = 30        # seconds
+MATCH_TYPES = {'match', 'championship'}  # event types that require a warmup buffer
 
 PENALTY_WEIGHTS = {
     'preferred_facility': 100,
@@ -77,6 +78,18 @@ def _is_juvenile(team: Team) -> bool:
     return any(ag.startswith(j) for j in JUVENILE_AGE_GROUPS)
 
 
+def _compatible_facilities(facilities: list, event_type: str) -> list[int]:
+    """Return indices of facilities that can host the given event type (HC7).
+
+    If a facility's suitable_for is empty, it accepts all event types.
+    """
+    compatible = []
+    for i, fac in enumerate(facilities):
+        if not fac.suitable_for or event_type in fac.suitable_for:
+            compatible.append(i)
+    return compatible
+
+
 def _generate_slots(requests, date_from: date, date_until: date, epoch: date) -> list[SlotInstance]:
     """Generate SlotInstances from pending BookingRequests."""
     slots = []
@@ -91,6 +104,22 @@ def _generate_slots(requests, date_from: date, date_until: date, epoch: date) ->
         time_start = _time_to_minutes(req.preferred_time_start)
         time_end = _time_to_minutes(req.preferred_time_end)
 
+        # One-time with target_date — create slot directly, skip day iteration
+        if req.recurrence == 'once' and req.target_date:
+            target = req.target_date
+            if effective_from <= target <= effective_until:
+                day_offset = (target - epoch).days * 24 * 60
+                slots.append(SlotInstance(
+                    request=req,
+                    target_date=target,
+                    duration=req.duration_minutes,
+                    day_start_offset=day_offset,
+                    time_start_min=time_start,
+                    time_end_min=time_end,
+                ))
+            continue
+
+        # Weekly or one-time without target_date (backward compat for old data)
         for day_name in req.preferred_days:
             weekday = DAY_NAME_TO_WEEKDAY.get(day_name.lower())
             if weekday is None:
@@ -99,12 +128,11 @@ def _generate_slots(requests, date_from: date, date_until: date, epoch: date) ->
             if req.recurrence == 'weekly':
                 # Find all occurrences of this weekday in the effective range
                 current = effective_from
-                # Advance to first matching weekday
                 days_ahead = (weekday - current.weekday()) % 7
                 current = current + timedelta(days=days_ahead)
 
                 while current <= effective_until:
-                    day_offset = (current - epoch).days * 24 * 60  # minutes from epoch to midnight
+                    day_offset = (current - epoch).days * 24 * 60
                     slots.append(SlotInstance(
                         request=req,
                         target_date=current,
@@ -116,7 +144,7 @@ def _generate_slots(requests, date_from: date, date_until: date, epoch: date) ->
                     current += timedelta(weeks=1)
 
             elif req.recurrence == 'once':
-                # Find the first matching weekday in the effective range
+                # Fallback: find the first matching weekday in the effective range
                 current = effective_from
                 days_ahead = (weekday - current.weekday()) % 7
                 current = current + timedelta(days=days_ahead)
@@ -131,7 +159,7 @@ def _generate_slots(requests, date_from: date, date_until: date, epoch: date) ->
                         time_start_min=time_start,
                         time_end_min=time_end,
                     ))
-                    break  # only one slot for one-time requests
+                    break
 
     return slots
 
@@ -202,9 +230,16 @@ def solve_schedule(date_from: date, date_until: date) -> SolverResult:
         start_min = _linearise(ev.start_time, epoch)
         end_min = _linearise(ev.end_time, epoch)
         duration = end_min - start_min
-        padded_duration = duration + CHANGEOVER_BUFFER  # HC4 changeover
 
-        fixed_interval = model.new_fixed_size_interval_var(start_min, padded_duration, f'fixed_{ev.id}')
+        # HC4 — warmup buffer before matches/championships only
+        if ev.event_type in MATCH_TYPES:
+            fac_start = start_min - WARMUP_BUFFER
+            fac_duration = duration + WARMUP_BUFFER
+        else:
+            fac_start = start_min
+            fac_duration = duration
+
+        fixed_interval = model.new_fixed_size_interval_var(fac_start, fac_duration, f'fixed_{ev.id}')
         fac_intervals[fac_idx].append(fixed_interval)
 
         # HC3 — team no-overlap (use actual duration, not padded)
@@ -217,6 +252,12 @@ def solve_schedule(date_from: date, date_until: date) -> SolverResult:
         req = slot.request
         team = req.team
 
+        # HC7 — Facility-Type Compatibility: restrict to compatible facilities
+        compatible_facs = _compatible_facilities(facilities, req.event_type)
+        if not compatible_facs:
+            # No compatible facility exists for this event type — skip slot
+            continue
+
         # Start variable: bounded by preferred time window on that day
         # Absolute minutes = day_start_offset + time_in_day
         lb = slot.day_start_offset + slot.time_start_min
@@ -227,9 +268,12 @@ def solve_schedule(date_from: date, date_until: date) -> SolverResult:
         slot.start_var = model.new_int_var(lb, ub, f'start_{idx}')
         end_var = model.new_int_var(lb + slot.duration, ub + slot.duration, f'end_{idx}')
         model.add(end_var == slot.start_var + slot.duration)  # HC6 duration match
-
-        # Facility variable
-        slot.facility_var = model.new_int_var(0, num_facilities - 1, f'fac_{idx}')
+        if len(compatible_facs) == 1:
+            slot.facility_var = model.new_constant(compatible_facs[0])
+        else:
+            slot.facility_var = model.new_int_var_from_domain(
+                cp_model.Domain.from_values(compatible_facs), f'fac_{idx}'
+            )
 
         # Main interval (for HC3 team overlap — uses actual duration)
         slot.interval_var = model.new_interval_var(
@@ -237,18 +281,27 @@ def solve_schedule(date_from: date, date_until: date) -> SolverResult:
         )
 
         # Per-facility optional intervals (for HC1 + HC4)
-        padded_duration = slot.duration + CHANGEOVER_BUFFER
-        padded_end = model.new_int_var(lb + padded_duration, ub + padded_duration, f'padded_end_{idx}')
-        model.add(padded_end == slot.start_var + padded_duration)
+        # HC4: matches/championships get a warmup buffer BEFORE the event
+        # Training and other events have no buffer (back-to-back is fine)
+        if req.event_type in MATCH_TYPES:
+            fac_start = model.new_int_var(lb - WARMUP_BUFFER, ub, f'fac_start_{idx}')
+            model.add(fac_start == slot.start_var - WARMUP_BUFFER)
+            fac_duration = slot.duration + WARMUP_BUFFER
+            fac_end = model.new_int_var(lb + slot.duration, ub + slot.duration, f'fac_end_{idx}')
+            model.add(fac_end == slot.start_var + slot.duration)
+        else:
+            fac_start = slot.start_var
+            fac_duration = slot.duration
+            fac_end = end_var
 
-        for fi in range(num_facilities):
+        for fi in compatible_facs:  # HC7: only create intervals for compatible facilities
             is_at_fac = model.new_bool_var(f'at_f{fi}_{idx}')
             slot.facility_bools[fi] = is_at_fac
             model.add(slot.facility_var == fi).only_enforce_if(is_at_fac)
             model.add(slot.facility_var != fi).only_enforce_if(is_at_fac.negated())
 
             opt_interval = model.new_optional_interval_var(
-                slot.start_var, padded_duration, padded_end, is_at_fac, f'opt_f{fi}_{idx}'
+                fac_start, fac_duration, fac_end, is_at_fac, f'opt_f{fi}_{idx}'
             )
             slot.facility_intervals[fi] = opt_interval
             fac_intervals[fi].append(opt_interval)
@@ -341,6 +394,8 @@ def solve_schedule(date_from: date, date_until: date) -> SolverResult:
     processed_request_ids = set()
 
     for idx, slot in enumerate(slots):
+        if slot.start_var is None:
+            continue  # slot was skipped (no compatible facility — HC7)
         req = slot.request
         start_abs = solver.value(slot.start_var)
         fac_idx = solver.value(slot.facility_var)

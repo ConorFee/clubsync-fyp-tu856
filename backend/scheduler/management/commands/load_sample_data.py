@@ -7,7 +7,7 @@ Creates:
 - 4 Facilities (Main Pitch, Training Pitch, Hall, Gym)
 - 8 Teams with age_groups, usual_day/time, is_flexible flags
 - 3 Fixed events (county fixtures)
-- 8 BookingRequests with varied preferences, priorities, days
+- 9 BookingRequests with varied preferences, priorities, days (includes 1 one-time event)
 """
 
 from datetime import date, time
@@ -28,10 +28,22 @@ class Command(BaseCommand):
 
         # ── Facilities ──
         self.stdout.write('Creating facilities...')
-        main_pitch = Facility.objects.create(name='Main Pitch', type='pitch')
-        training_pitch = Facility.objects.create(name='Training Pitch', type='pitch')
-        hall = Facility.objects.create(name='Hall', type='hall')
-        gym = Facility.objects.create(name='Gym', type='gym')
+        main_pitch = Facility.objects.create(
+            name='Main Pitch', type='pitch',
+            suitable_for=['match', 'championship', 'adult_training', 'juvenile_training'],
+        )
+        training_pitch = Facility.objects.create(
+            name='Training Pitch', type='pitch',
+            suitable_for=['adult_training', 'juvenile_training'],
+        )
+        hall = Facility.objects.create(
+            name='Hall', type='hall',
+            suitable_for=['meeting'],
+        )
+        gym = Facility.objects.create(
+            name='Gym', type='gym',
+            suitable_for=['gym_session'],
+        )
 
         # ── Teams ──
         self.stdout.write('Creating teams...')
@@ -148,7 +160,7 @@ class Command(BaseCommand):
             event_type='adult_training', duration_minutes=90,
             recurrence='weekly',
             preferred_facility=main_pitch,
-            preferred_days=['tuesday', 'thursday'],
+            preferred_days=['tuesday', 'wednesday'],
             preferred_time_start=time(19, 0), preferred_time_end=time(21, 30),
             priority=2,
             schedule_from=march_from, schedule_until=march_until,
@@ -198,6 +210,19 @@ class Command(BaseCommand):
             schedule_from=march_from, schedule_until=march_until,
         )
 
+        # One-time event using target_date
+        BookingRequest.objects.create(
+            team=senior_men, title='Senior Men Pre-Match Meeting',
+            event_type='meeting', duration_minutes=60,
+            recurrence='once',
+            preferred_facility=hall,
+            preferred_days=['saturday'],
+            target_date=date(2026, 3, 14),
+            preferred_time_start=time(10, 0), preferred_time_end=time(12, 0),
+            priority=3,
+            schedule_from=date(2026, 3, 14), schedule_until=date(2026, 3, 14),
+        )
+
         self.stdout.write(self.style.SUCCESS(
-            'Sample data loaded: 4 facilities, 8 teams, 3 fixed events, 8 booking requests'
+            'Sample data loaded: 4 facilities, 8 teams, 3 fixed events, 9 booking requests'
         ))
