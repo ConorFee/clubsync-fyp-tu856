@@ -1,12 +1,5 @@
 import axios from "axios";
 
-// --- Legacy solver check ---
-
-export async function runSolverCheck(): Promise<string> {
-  const response = await axios.post<{ message: string }>("/api/schedule/solve/");
-  return response.data.message;
-}
-
 // --- Schedule Diff ---
 
 export interface WeeklyBreakdownEntry {
