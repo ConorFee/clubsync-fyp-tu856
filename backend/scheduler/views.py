@@ -1,30 +1,59 @@
 from rest_framework import viewsets
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import Facility, Event, Team, BookingRequest
 from .serializers import FacilitySerializer, EventSerializer, TeamSerializer, BookingRequestSerializer
+from .permissions import IsAdminRole, IsCoachOrAdmin
 from .solver import solve_schedule as run_solver
 from collections import defaultdict, Counter
 from datetime import date
 
 
 class FacilityViewSet(viewsets.ReadOnlyModelViewSet):
+    """All authenticated users can view facilities."""
     queryset = Facility.objects.all()
     serializer_class = FacilitySerializer
+    permission_classes = [IsAuthenticated]
 
 class TeamViewSet(viewsets.ModelViewSet):
+    """All authenticated users can view teams. Only admins can create/edit/delete."""
     queryset = Team.objects.all()
     serializer_class = TeamSerializer
 
+    def get_permissions(self):
+        if self.action in ('list', 'retrieve'):
+            return [IsAuthenticated()]
+        return [IsAdminRole()]
+
 class BookingRequestViewSet(viewsets.ModelViewSet):
-    queryset = BookingRequest.objects.all().order_by('-created_at')
+    """Coaches see their own team's requests. Admins see all."""
     serializer_class = BookingRequestSerializer
 
+    def get_permissions(self):
+        if self.action in ('list', 'retrieve'):
+            return [IsCoachOrAdmin()]
+        return [IsCoachOrAdmin()]
+
+    def get_queryset(self):
+        user = self.request.user
+        qs = BookingRequest.objects.all().order_by('-created_at')
+        if hasattr(user, 'profile') and user.profile.role == 'coach' and user.profile.team:
+            return qs.filter(team=user.profile.team)
+        return qs
+
 class EventViewSet(viewsets.ModelViewSet):
+    """All authenticated users can view events. Only admins can create/edit/delete."""
     queryset = Event.objects.all().order_by('start_time')
     serializer_class = EventSerializer
 
+    def get_permissions(self):
+        if self.action in ('list', 'retrieve'):
+            return [IsAuthenticated()]
+        return [IsAdminRole()]
+
 @api_view(['POST'])
+@permission_classes([IsAdminRole])
 def generate_schedule(request):
     """
     Run the CP-SAT solver to generate a conflict-free schedule from pending BookingRequests.
@@ -184,6 +213,7 @@ def generate_schedule(request):
 
 
 @api_view(['POST'])
+@permission_classes([IsAdminRole])
 def publish_schedule(request):
     """
     Publish all proposed events in a date range — proposed → published.
@@ -213,6 +243,7 @@ def publish_schedule(request):
 
 
 @api_view(['POST'])
+@permission_classes([IsAdminRole])
 def discard_schedule(request):
     """
     Discard all proposed events in a date range and reset BookingRequests to pending.

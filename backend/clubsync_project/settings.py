@@ -147,9 +147,9 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # REST Framework configuration 
-REST_FRAMEWORK = { 
-    'DEFAULT_PERMISSION_CLASSES': [ 
-        'rest_framework.permissions.AllowAny', 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_RENDERER_CLASSES': [ 
         'rest_framework.renderers.JSONRenderer', 
@@ -157,5 +157,9 @@ REST_FRAMEWORK = {
     ],
 }
 
-# CORS settings for development 
+# CORS / CSRF settings for development
 CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
