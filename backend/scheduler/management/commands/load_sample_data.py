@@ -11,9 +11,10 @@ Creates:
 """
 
 from datetime import date, time
+from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from scheduler.models import Facility, Team, Event, BookingRequest
+from scheduler.models import Facility, Team, Event, BookingRequest, UserProfile
 
 
 class Command(BaseCommand):
@@ -223,6 +224,29 @@ class Command(BaseCommand):
             schedule_from=date(2026, 3, 14), schedule_until=date(2026, 3, 14),
         )
 
+        # ── Users ──
+        self.stdout.write('Creating users...')
+        UserProfile.objects.all().delete()
+        User.objects.filter(username__in=['admin', 'coach', 'viewer']).delete()
+
+        admin_user = User.objects.create_user(
+            username='admin', password='admin123',
+            first_name='Conor', last_name='Fee', is_staff=True,
+        )
+        UserProfile.objects.create(user=admin_user, role='admin')
+
+        coach_user = User.objects.create_user(
+            username='coach', password='coach123',
+            first_name='John', last_name='Murphy',
+        )
+        UserProfile.objects.create(user=coach_user, role='coach', team=u14_boys)
+
+        viewer_user = User.objects.create_user(
+            username='viewer', password='viewer123',
+            first_name='Mary', last_name='Kelly',
+        )
+        UserProfile.objects.create(user=viewer_user, role='viewer')
+
         self.stdout.write(self.style.SUCCESS(
-            'Sample data loaded: 4 facilities, 8 teams, 3 fixed events, 9 booking requests'
+            'Sample data loaded: 4 facilities, 8 teams, 3 fixed events, 9 booking requests, 3 users (admin/coach/viewer)'
         ))
