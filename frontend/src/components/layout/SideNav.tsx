@@ -1,29 +1,29 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import './SideNav.css';
 
 interface NavItem {
   path: string;
   label: string;
   icon: string;
-  adminOnly?: boolean;
+  roles: string[];
 }
 
 const navItems: NavItem[] = [
-  { path: '/calendar', label: 'Calendar', icon: '📅' },
-  { path: '/bookings', label: 'Bookings', icon: '📝' },
-  { path: '/teams', label: 'Teams', icon: '👥', adminOnly: true },
+  { path: '/calendar', label: 'Calendar', icon: '📅', roles: ['admin', 'coach', 'viewer'] },
+  { path: '/bookings', label: 'Bookings', icon: '📝', roles: ['admin', 'coach'] },
+  { path: '/teams', label: 'Teams', icon: '👥', roles: ['admin'] },
 ];
 
 export default function SideNav() {
   const [collapsed, setCollapsed] = useState(false);
+  const { user } = useAuth();
 
-  // Phase 2 (Week 4): Get role from auth context
-  // For now, show all items (admin view)
-  const userRole = 'admin';
+  const userRole = user?.role ?? 'viewer';
 
-  const visibleItems = navItems.filter(
-    (item) => !item.adminOnly || userRole === 'admin'
+  const visibleItems = navItems.filter((item) =>
+    item.roles.includes(userRole)
   );
 
   return (

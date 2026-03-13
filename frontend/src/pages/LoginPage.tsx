@@ -1,23 +1,33 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import './LoginPage.css';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    // Static placeholder — no backend auth yet
-    // In Phase 2 (Week 4), this will call Django auth endpoint
-    if (username && password) {
-      navigate('/calendar');
-    } else {
+    if (!username || !password) {
       setError('Please enter both username and password.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await login(username, password);
+      navigate('/calendar');
+    } catch {
+      setError('Invalid username or password.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -62,8 +72,12 @@ export default function LoginPage() {
                 </div>
 
                 <div className="d-grid">
-                  <button type="submit" className="btn btn-primary btn-login">
-                    Login
+                  <button
+                    type="submit"
+                    className="btn btn-primary btn-login"
+                    disabled={loading}
+                  >
+                    {loading ? 'Logging in...' : 'Login'}
                   </button>
                 </div>
               </form>
