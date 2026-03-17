@@ -1,0 +1,25 @@
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--cs-gray-200);
+}
+
+.page-header__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--cs-gray-900);
+  margin: 0;
+}
+
+.page-header__subtitle {
+  font-size: 0.875rem;
+  color: var(--cs-gray-500);
+  margin: 4px 0 0;
+}
+
+.page-header__action {
+  flex-shrink: 0;
+}

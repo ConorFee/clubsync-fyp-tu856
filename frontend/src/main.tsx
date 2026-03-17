@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import axios from 'axios'
 import 'bootstrap/dist/css/bootstrap.min.css'
+import './styles/clubsync-theme.css'
 import './styles/index.css'
 import App from './App.tsx'
 

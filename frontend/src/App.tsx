@@ -3,10 +3,14 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 
 import AuthenticatedLayout from './components/layout/AuthenticatedLayout';
 import LoginPage from './pages/LoginPage';
+import DashboardPage from './pages/DashboardPage';
 import CalendarPage from './pages/CalendarPage';
-import BookingsPage from './pages/BookingsPage';
+import RequestsPage from './pages/RequestsPage';
 import BookingRequestForm from './components/BookingRequestForm';
 import TeamsPage from './pages/TeamsPage';
+import FacilitiesPage from './pages/FacilitiesPage';
+import ReportsPage from './pages/ReportsPage';
+import SettingsPage from './pages/SettingsPage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -41,9 +45,8 @@ function LoginRoute() {
     );
   }
 
-  // Already logged in — go straight to calendar
   if (isAuthenticated) {
-    return <Navigate to="/calendar" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <LoginPage />;
@@ -63,11 +66,20 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
+        <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/calendar" element={<CalendarPage />} />
-        <Route path="/bookings" element={<BookingsPage />} />
-        <Route path="/bookings/new" element={<BookingRequestForm />} />
-        <Route path="/bookings/:id" element={<BookingRequestForm />} />
+        <Route path="/requests" element={<RequestsPage />} />
+        <Route path="/requests/new" element={<BookingRequestForm />} />
+        <Route path="/requests/:id" element={<BookingRequestForm />} />
+        <Route path="/facilities" element={<FacilitiesPage />} />
+        <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
         <Route path="/teams" element={<TeamsPage />} />
+
+        {/* Backward compat: /bookings → /requests */}
+        <Route path="/bookings" element={<Navigate to="/requests" replace />} />
+        <Route path="/bookings/new" element={<Navigate to="/requests/new" replace />} />
+        <Route path="/bookings/:id" element={<Navigate to="/requests/:id" replace />} />
       </Route>
     </Routes>
   );
