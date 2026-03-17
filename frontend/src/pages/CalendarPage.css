@@ -4,174 +4,70 @@
   flex-direction: column;
 }
 
-.calendar-page-header {
+/* Toolbar */
+.cal-toolbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-.calendar-page-header h2 {
-  margin: 0;
-  color: #1a1a1a;
-  font-weight: 600;
-}
-
-/* ── Solver Controls ── */
-.solver-controls {
-  display: flex;
-  align-items: flex-end;
   gap: 16px;
   margin-bottom: 16px;
-  padding: 14px 18px;
-  background: #fff;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
-  flex-wrap: wrap;
 }
 
-.solver-dates {
+.cal-filter {
   display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
 }
 
-.solver-date-label {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 0.78rem;
+.cal-filter-label {
+  font-size: 0.8rem;
   font-weight: 600;
-  color: #666;
+  color: var(--cs-gray-500);
 }
 
-.solver-date-input {
-  padding: 7px 10px;
-  border: 1px solid #d0d0d0;
+.cal-filter-select {
+  padding: 6px 12px;
+  border: 1px solid var(--cs-gray-200);
   border-radius: 6px;
-  font-size: 0.875rem;
-  color: #333;
-  transition: border-color 0.15s;
+  font-size: 0.85rem;
+  color: var(--cs-gray-700);
+  background: #fff;
 }
 
-.solver-date-input:focus {
+.cal-filter-select:focus {
   outline: none;
-  border-color: #1a73e8;
-  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.08);
+  border-color: var(--cs-blue-600);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
 }
 
-.solver-buttons {
-  display: flex;
-  gap: 10px;
-  margin-left: auto;
-}
-
-.solver-btn {
-  padding: 8px 18px;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.15s, opacity 0.15s;
-}
-
-.solver-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.solver-btn--generate {
-  background: #e65100;
-  color: #fff;
-}
-
-.solver-btn--generate:hover:not(:disabled) {
-  background: #bf4400;
-}
-
-.solver-btn--publish {
-  background: #2e7d32;
-  color: #fff;
-}
-
-.solver-btn--publish:hover:not(:disabled) {
-  background: #256428;
-}
-
-.solver-btn--discard {
-  background: #fff;
-  color: #c62828;
-  border: 1px solid #c62828;
-}
-
-.solver-btn--discard:hover:not(:disabled) {
-  background: #fff3f3;
-}
-
-/* ── Solver Result Banner ── */
-.solver-result-banner {
+.cal-btn-primary {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 10px 16px;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  margin-bottom: 16px;
+  gap: 6px;
+  background-color: var(--cs-blue-600);
+  border-color: var(--cs-blue-600);
 }
 
-.solver-result--success {
-  background: #e8f5e9;
-  border: 1px solid #a5d6a7;
-  color: #2e7d32;
+.cal-btn-primary:hover {
+  background-color: var(--cs-blue-700);
+  border-color: var(--cs-blue-700);
 }
 
-.solver-result--error {
-  background: #fff3f3;
-  border: 1px solid #f5c6c6;
-  color: #c62828;
-}
-
-.solver-result-dismiss {
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  cursor: pointer;
-  color: inherit;
-  padding: 0 4px;
-  line-height: 1;
-  opacity: 0.7;
-}
-
-.solver-result-dismiss:hover {
-  opacity: 1;
-}
-
-/* ── Calendar Layout ── */
-.calendar-layout {
-  display: flex;
-  gap: 16px;
-  flex: 1;
-  min-height: 0;
-}
-
+/* Calendar wrapper */
 .calendar-wrapper {
   flex: 1;
   background: white;
   border-radius: 8px;
+  border: 1px solid var(--cs-gray-200);
   padding: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   overflow: auto;
 }
 
-/* ── Colour Legend ── */
+/* Colour legend */
 .calendar-legend {
   display: flex;
   gap: 20px;
   padding: 12px 0 4px;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid var(--cs-gray-200);
   margin-top: 12px;
 }
 
@@ -180,7 +76,7 @@
   align-items: center;
   gap: 6px;
   font-size: 0.8rem;
-  color: #666;
+  color: var(--cs-gray-500);
 }
 
 .legend-dot {
