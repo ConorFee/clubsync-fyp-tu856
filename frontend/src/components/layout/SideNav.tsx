@@ -1,25 +1,34 @@
-import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import {
+  LayoutDashboard,
+  Calendar,
+  FileText,
+  Building2,
+  BarChart3,
+  Settings,
+  type LucideIcon,
+} from 'lucide-react';
 import './SideNav.css';
 
 interface NavItem {
   path: string;
   label: string;
-  icon: string;
+  icon: LucideIcon;
   roles: string[];
 }
 
 const navItems: NavItem[] = [
-  { path: '/calendar', label: 'Calendar', icon: '📅', roles: ['admin', 'coach', 'viewer'] },
-  { path: '/bookings', label: 'Bookings', icon: '📝', roles: ['admin', 'coach'] },
-  { path: '/teams', label: 'Teams', icon: '👥', roles: ['admin'] },
+  { path: '/dashboard',  label: 'Dashboard',  icon: LayoutDashboard, roles: ['admin', 'coach', 'viewer'] },
+  { path: '/calendar',   label: 'Calendar',   icon: Calendar,        roles: ['admin', 'coach', 'viewer'] },
+  { path: '/requests',   label: 'Requests',   icon: FileText,        roles: ['admin', 'coach'] },
+  { path: '/facilities', label: 'Facilities', icon: Building2,       roles: ['admin'] },
+  { path: '/reports',    label: 'Reports',    icon: BarChart3,       roles: ['admin'] },
+  { path: '/settings',   label: 'Settings',   icon: Settings,        roles: ['admin'] },
 ];
 
 export default function SideNav() {
-  const [collapsed, setCollapsed] = useState(false);
   const { user } = useAuth();
-
   const userRole = user?.role ?? 'viewer';
 
   const visibleItems = navItems.filter((item) =>
@@ -27,30 +36,24 @@ export default function SideNav() {
   );
 
   return (
-    <nav className={`sidenav ${collapsed ? 'sidenav-collapsed' : ''}`}>
+    <nav className="sidenav">
       <div className="sidenav-items">
-        {visibleItems.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            className={({ isActive }) =>
-              `sidenav-link ${isActive ? 'sidenav-link-active' : ''}`
-            }
-            title={collapsed ? item.label : undefined}
-          >
-            <span className="sidenav-icon">{item.icon}</span>
-            {!collapsed && <span className="sidenav-label">{item.label}</span>}
-          </NavLink>
-        ))}
+        {visibleItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={({ isActive }) =>
+                `sidenav-link ${isActive ? 'sidenav-link-active' : ''}`
+              }
+            >
+              <Icon size={20} className="sidenav-icon" />
+              <span className="sidenav-label">{item.label}</span>
+            </NavLink>
+          );
+        })}
       </div>
-
-      <button
-        className="sidenav-toggle"
-        onClick={() => setCollapsed(!collapsed)}
-        title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-      >
-        {collapsed ? '›' : '‹'}
-      </button>
     </nav>
   );
 }
