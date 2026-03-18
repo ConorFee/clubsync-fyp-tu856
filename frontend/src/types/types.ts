@@ -2,6 +2,7 @@ export interface FacilityType {
     id: number;
     name: string;
     type: string;
+    suitable_for: string[];
 }
 
 export interface TeamType {
@@ -44,7 +45,7 @@ export const EVENT_TYPE_DURATIONS: Record<EventTypeChoice, number | null> = {
     other: null,
 };
 
-export interface EventType {
+export interface ScheduleEvent {
     id: number;
     title: string;
     start_time: string;
