@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { createEvent, updateEvent } from "../api/events";
-import type { EventType, FacilityType, CreateEventPayload, EventTypeChoice } from "../types/types";
+import type { ScheduleEvent, FacilityType, CreateEventPayload, EventTypeChoice } from "../types/types";
 import { EVENT_TYPE_LABELS, EVENT_TYPE_DURATIONS } from "../types/types";
 import "./EventFormModal.css";
 
@@ -8,7 +8,7 @@ interface EventFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: () => void;
-  event?: EventType;
+  event?: ScheduleEvent;
   facilities: FacilityType[];
 }
 
@@ -119,8 +119,8 @@ export default function EventFormModal({
     // Convert form data to API payload format
     const payload: CreateEventPayload = {
       title: formData.title,
-      start_time: `${formData.startDate}T${formData.startTime}:00Z`, // ISO format
-      end_time: `${formData.endDate}T${formData.endTime}:00Z`,
+      start_time: `${formData.startDate}T${formData.startTime}:00`,
+      end_time: `${formData.endDate}T${formData.endTime}:00`,
       facility: formData.facility, // Facility NAME (not ID)
       is_fixed: formData.isFixed,
       team_name: formData.teamName || undefined,
