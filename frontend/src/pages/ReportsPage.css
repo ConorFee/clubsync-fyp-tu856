@@ -1,0 +1,201 @@
+/* Stat cards row */
+.rpt-stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+/* Card wrapper */
+.rpt-card {
+  background: #fff;
+  border: 1px solid var(--cs-gray-200);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.rpt-card__title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--cs-gray-900);
+  margin: 0 0 16px;
+}
+
+.rpt-card__empty {
+  font-size: 0.85rem;
+  color: var(--cs-gray-500);
+  text-align: center;
+  padding: 20px 0;
+}
+
+/* Status breakdown row */
+.rpt-status-row {
+  display: flex;
+  gap: 12px;
+}
+
+.rpt-status-chip {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--cs-gray-200);
+}
+
+.rpt-status-count {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.rpt-status-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+.rpt-status-chip--total {
+  background: var(--cs-blue-50);
+}
+
+.rpt-status-chip--total .rpt-status-count {
+  color: var(--cs-blue-700);
+}
+
+.rpt-status-chip--total .rpt-status-label {
+  color: var(--cs-blue-600);
+}
+
+.rpt-status-chip--scheduled {
+  background: var(--cs-green-100);
+}
+
+.rpt-status-chip--scheduled .rpt-status-count {
+  color: var(--cs-green-600);
+}
+
+.rpt-status-chip--scheduled .rpt-status-label {
+  color: var(--cs-green-600);
+}
+
+.rpt-status-chip--pending {
+  background: var(--cs-orange-100);
+}
+
+.rpt-status-chip--pending .rpt-status-count {
+  color: var(--cs-orange-600);
+}
+
+.rpt-status-chip--pending .rpt-status-label {
+  color: var(--cs-orange-600);
+}
+
+.rpt-status-chip--rejected {
+  background: var(--cs-red-100);
+}
+
+.rpt-status-chip--rejected .rpt-status-count {
+  color: var(--cs-red-600);
+}
+
+.rpt-status-chip--rejected .rpt-status-label {
+  color: var(--cs-red-600);
+}
+
+/* Two-column grid */
+.rpt-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.rpt-grid .rpt-card {
+  margin-bottom: 0;
+}
+
+/* Bar chart list */
+.rpt-bar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rpt-bar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rpt-bar-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rpt-bar-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--cs-gray-900);
+}
+
+.rpt-bar-count {
+  font-size: 0.75rem;
+  color: var(--cs-gray-500);
+}
+
+.rpt-bar-track {
+  height: 8px;
+  background: var(--cs-gray-100);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.rpt-bar-fill {
+  height: 100%;
+  background: var(--cs-blue-600);
+  border-radius: 4px;
+  min-width: 4px;
+  transition: width 0.3s ease;
+}
+
+/* Team table */
+.rpt-team-table-wrap {
+  overflow-x: auto;
+}
+
+.rpt-team-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.rpt-team-table thead th {
+  color: var(--cs-gray-500);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--cs-gray-200);
+}
+
+.rpt-team-table tbody tr {
+  border-bottom: 1px solid var(--cs-gray-100);
+}
+
+.rpt-team-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.rpt-team-table td {
+  padding: 10px 12px;
+  vertical-align: middle;
+  color: var(--cs-gray-700);
+}
+
+.rpt-team-name {
+  font-weight: 500;
+  color: var(--cs-gray-900);
+}
