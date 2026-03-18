@@ -1,12 +1,12 @@
 import "./Sidebar.css";
-import type { EventType } from "../../types/types";
+import type { ScheduleEvent } from "../../types/types";
 
 interface SidebarProps {
   onRefresh: () => void;
-  events: EventType[];
+  events: ScheduleEvent[];
   selectedFacility: string;
   onSelectFacility: (name: string) => void;
-  onEditEvent?: (event: EventType) => void;
+  onEditEvent?: (event: ScheduleEvent) => void;
   onDeleteEvent?: (id: number) => void;
 }
 

@@ -3,14 +3,14 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import type { EventClickArg } from "@fullcalendar/core";
-import type { EventType } from "../types/types";
+import type { ScheduleEvent } from "../types/types";
 
 interface CalendarViewProps {
-  events: EventType[];
-  onEventClick?: (event: EventType) => void;
+  events: ScheduleEvent[];
+  onEventClick?: (event: ScheduleEvent) => void;
 }
 
-function getEventColor(e: EventType): string {
+function getEventColor(e: ScheduleEvent): string {
   if (e.is_fixed) return '#c62828';       // Red — county fixtures
   switch (e.status) {
     case 'published': return '#2e7d32';   // Green — confirmed

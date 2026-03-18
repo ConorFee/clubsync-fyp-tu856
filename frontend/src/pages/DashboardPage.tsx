@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { fetchEvents } from '../api/events';
 import { fetchBookingRequests } from '../api/requests';
-import type { EventType, BookingRequestType } from '../types/types';
+import type { ScheduleEvent, BookingRequestType } from '../types/types';
 import { EVENT_TYPE_LABELS } from '../types/types';
 import PageHeader from '../components/common/PageHeader';
 import StatCard from '../components/common/StatCard';
@@ -22,7 +22,7 @@ import './DashboardPage.css';
 export default function DashboardPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [events, setEvents] = useState<EventType[]>([]);
+  const [events, setEvents] = useState<ScheduleEvent[]>([]);
   const [requests, setRequests] = useState<BookingRequestType[]>([]);
   const [loading, setLoading] = useState(true);
 
