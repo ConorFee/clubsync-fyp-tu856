@@ -5,6 +5,7 @@
 
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, time
+from django.db.models import Q
 from ortools.sat.python import cp_model
 
 from .models import Facility, Team, Event, BookingRequest
@@ -428,5 +429,4 @@ def solve_schedule(date_from: date, date_until: date) -> SolverResult:
 
 def models_q_fixed_or_published():
     """Return a Q object for fixed or published events."""
-    from django.db.models import Q
     return Q(is_fixed=True) | Q(status='published')
