@@ -20,6 +20,10 @@ import {
 } from 'lucide-react';
 import './RequestsPage.css';
 
+// sessionStorage keys for solver state persistence across navigation
+const STORAGE_KEY_RESULT = 'clubsync_solverResult';
+const STORAGE_KEY_DATES = 'clubsync_solverDates';
+
 const PRIORITY_LABELS: Record<1 | 2 | 3, string> = {
   1: 'Low',
   2: 'Medium',
@@ -62,6 +66,22 @@ export default function RequestsPage() {
 
   const hasProposedEvents = events.some((e) => e.status === 'proposed');
 
+  // Restore solver state from sessionStorage (survives navigation)
+  useEffect(() => {
+    try {
+      const savedResult = sessionStorage.getItem(STORAGE_KEY_RESULT);
+      const savedDates = sessionStorage.getItem(STORAGE_KEY_DATES);
+      if (savedResult) setSolverResult(JSON.parse(savedResult));
+      if (savedDates) {
+        const { dateFrom: df, dateUntil: du } = JSON.parse(savedDates);
+        setDateFrom(df);
+        setDateUntil(du);
+      }
+    } catch {
+      // Corrupted storage — ignore
+    }
+  }, []);
+
   const loadData = useCallback(async () => {
     setLoading(true);
     setError('');
@@ -72,6 +92,21 @@ export default function RequestsPage() {
       ]);
       setRequests(reqs);
       setEvents(evts);
+
+      // Auto-derive date range from proposed events (fallback if sessionStorage empty)
+      const proposed = evts.filter((e: ScheduleEvent) => e.status === 'proposed');
+      if (proposed.length > 0) {
+        setDateFrom((prev) => {
+          if (prev) return prev;
+          const dates = proposed.map((e: ScheduleEvent) => e.start_time.split('T')[0]).sort();
+          return dates[0];
+        });
+        setDateUntil((prev) => {
+          if (prev) return prev;
+          const dates = proposed.map((e: ScheduleEvent) => e.start_time.split('T')[0]).sort();
+          return dates[dates.length - 1];
+        });
+      }
     } catch {
       setError('Failed to load data. Is the backend running?');
     } finally {
@@ -101,6 +136,11 @@ export default function RequestsPage() {
     try {
       const result = await generateSchedule(dateFrom, dateUntil);
       setSolverResult(result);
+      // Persist for navigation resilience
+      try {
+        sessionStorage.setItem(STORAGE_KEY_RESULT, JSON.stringify(result));
+        sessionStorage.setItem(STORAGE_KEY_DATES, JSON.stringify({ dateFrom, dateUntil }));
+      } catch { /* storage full or disabled */ }
       loadData();
     } catch (err) {
       console.error('Solver error:', err);
@@ -121,6 +161,8 @@ export default function RequestsPage() {
     try {
       await publishSchedule(dateFrom, dateUntil);
       setSolverResult(null);
+      sessionStorage.removeItem(STORAGE_KEY_RESULT);
+      sessionStorage.removeItem(STORAGE_KEY_DATES);
       loadData();
     } catch (err) {
       console.error('Publish error:', err);
@@ -136,6 +178,10 @@ export default function RequestsPage() {
     try {
       await discardSchedule(dateFrom, dateUntil);
       setSolverResult(null);
+      sessionStorage.removeItem(STORAGE_KEY_RESULT);
+      sessionStorage.removeItem(STORAGE_KEY_DATES);
+      setDateFrom('');
+      setDateUntil('');
       loadData();
     } catch (err) {
       console.error('Discard error:', err);
@@ -271,7 +317,10 @@ export default function RequestsPage() {
               : solverResult.message || `${solverResult.solver_status}: Could not generate a schedule.`
             }
           </span>
-          <button className="req-solver-dismiss" onClick={() => setSolverResult(null)}>
+          <button className="req-solver-dismiss" onClick={() => {
+            setSolverResult(null);
+            sessionStorage.removeItem(STORAGE_KEY_RESULT);
+          }}>
             &times;
           </button>
         </div>
