@@ -149,6 +149,7 @@ class BookingRequest(models.Model):
         ('scheduled', 'Scheduled'),
         ('partial', 'Partially Scheduled'),
         ('rejected', 'Rejected'),
+        ('published', 'Published'),
     ]
 
     RECURRENCE_CHOICES = [

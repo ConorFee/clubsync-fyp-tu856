@@ -13,6 +13,7 @@ const STATUS_CONFIG: Record<
   scheduled: { label: "Scheduled", className: "bp-badge--scheduled" },
   partial:   { label: "Partial",   className: "bp-badge--partial" },
   rejected:  { label: "Rejected",  className: "bp-badge--rejected" },
+  published: { label: "Published", className: "bp-badge--scheduled" },
 };
 
 const PRIORITY_LABELS: Record<1 | 2 | 3, string> = {

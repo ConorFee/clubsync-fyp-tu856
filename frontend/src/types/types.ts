@@ -73,7 +73,7 @@ export interface BookingRequestType {
     preferred_time_end: string;         // HH:MM
     priority: 1 | 2 | 3;
     priority_display: string;           // 'Low' | 'Medium' | 'High'
-    status: 'pending' | 'scheduled' | 'partial' | 'rejected';
+    status: 'pending' | 'scheduled' | 'partial' | 'rejected' | 'published';
     status_display: string;
     schedule_from: string;              // YYYY-MM-DD
     schedule_until: string;             // YYYY-MM-DD

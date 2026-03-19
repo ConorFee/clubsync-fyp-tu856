@@ -236,6 +236,13 @@ def publish_schedule(request):
         start_time__date__lte=date_until,
     ).update(status='published')
 
+    # Mark corresponding BookingRequests as published (terminal status)
+    BookingRequest.objects.filter(
+        status='scheduled',
+        schedule_from__lte=date_until,
+        schedule_until__gte=date_from,
+    ).update(status='published')
+
     return Response({
         'success': True,
         'events_published': count,
