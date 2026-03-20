@@ -34,4 +34,5 @@ RUN SECRET_KEY=build-placeholder python manage.py collectstatic --noinput
 
 EXPOSE 8000
 
-CMD ["gunicorn", "clubsync_project.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2", "--timeout", "120"]
+# Entrypoint: run migrations + load sample data, then start Gunicorn
+CMD ["bash", "entrypoint.sh"]
