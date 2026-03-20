@@ -1,0 +1,33 @@
+# Virtual environment
+backend/clubsync_venv/
+
+# Node modules
+frontend/node_modules/
+frontend/dist/
+
+# Git
+.git/
+.gitignore
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment files
+backend/.env
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# IDE
+.vscode/
+.idea/
+
+# Claude
+.claude/
+
+# OS files
+.DS_Store
