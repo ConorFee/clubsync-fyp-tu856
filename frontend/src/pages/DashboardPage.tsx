@@ -61,7 +61,7 @@ export default function DashboardPage() {
   const pendingRequests = requests.filter((r) => r.status === 'pending');
   const conflictingCount = events.filter((e) => e.status === 'proposed').length;
   const totalPublished = events.filter((e) => e.status === 'published').length;
-  const totalFacilities = new Set(events.map((e) => e.facility?.name)).size;
+  const totalFacilities = new Set(events.map((e) => e.facility)).size;
   const facilityUsage = totalFacilities > 0 ? Math.min(Math.round((totalPublished / Math.max(totalFacilities * 5, 1)) * 100), 100) : 0;
 
   const today = new Date();
@@ -156,7 +156,7 @@ export default function DashboardPage() {
                     <div className="dash-event-info">
                       <span className="dash-event-title">{evt.title}</span>
                       <span className="dash-event-meta">
-                        {evt.facility?.name} &middot;{' '}
+                        {evt.facility} &middot;{' '}
                         {start.toLocaleDateString('en-IE', { weekday: 'short', day: 'numeric', month: 'short' })}{' '}
                         {start.toLocaleTimeString('en-IE', { hour: '2-digit', minute: '2-digit' })}
                         –{end.toLocaleTimeString('en-IE', { hour: '2-digit', minute: '2-digit' })}

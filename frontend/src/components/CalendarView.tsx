@@ -45,7 +45,7 @@ export default function CalendarView({ events, onEventClick }: CalendarViewProps
       height="auto"
       eventClick={handleEventClick}
       events={events.map((e) => ({
-        title: `${e.title} – ${e.facility.name}`,
+        title: `${e.title} – ${e.facility}`,
         start: e.start_time,
         end: e.end_time,
         backgroundColor: getEventColor(e),

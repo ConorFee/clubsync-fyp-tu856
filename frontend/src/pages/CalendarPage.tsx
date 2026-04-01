@@ -25,7 +25,7 @@ export default function CalendarPage() {
   const [selectedEvent, setSelectedEvent] = useState<ScheduleEvent | null>(null);
 
   const filteredEvents = events.filter((e) =>
-    selectedFacility === 'All' ? true : e.facility.name === selectedFacility
+    selectedFacility === 'All' ? true : e.facility === selectedFacility
   );
 
   useEffect(() => {

@@ -64,7 +64,7 @@ export default function Sidebar({
                 {ev.is_fixed ? 'Fixed' : ev.status.charAt(0).toUpperCase() + ev.status.slice(1)}
               </span>
               <span>•</span>
-              <span>{ev.facility.name}</span>
+              <span>{ev.facility}</span>
             </div>
 
             <div className="event-actions">

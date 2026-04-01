@@ -48,7 +48,7 @@ export default function EventFormModal({
       setFormData({
         eventType: event.event_type || "other",
         title: event.title,
-        facility: event.facility.name, // Extract name from facility object
+        facility: event.facility, // Already a string (SlugRelatedField)
         startDate: startDate.toISOString().split("T")[0],
         startTime: startDate.toTimeString().slice(0, 5),
         endDate: endDate.toISOString().split("T")[0],

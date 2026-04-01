@@ -53,7 +53,7 @@ export default function ReportsPage() {
     ? Math.round((scheduledRequests / requests.length) * 100)
     : 0;
 
-  const facilitiesUsed = new Set(activeEvents.map((e) => e.facility?.name)).size;
+  const facilitiesUsed = new Set(activeEvents.map((e) => e.facility)).size;
   const facilityUsage = facilities.length > 0
     ? Math.round((facilitiesUsed / facilities.length) * 100)
     : 0;
@@ -71,7 +71,7 @@ export default function ReportsPage() {
   // Facility utilization: events per facility
   const facilityEventCounts: Record<string, number> = {};
   activeEvents.forEach((e) => {
-    const name = e.facility?.name ?? 'Unknown';
+    const name = e.facility ?? 'Unknown';
     facilityEventCounts[name] = (facilityEventCounts[name] || 0) + 1;
   });
   const maxFacilityEvents = Math.max(...Object.values(facilityEventCounts), 1);

@@ -50,7 +50,7 @@ export interface ScheduleEvent {
     title: string;
     start_time: string;
     end_time: string;
-    facility: FacilityType;
+    facility: string;
     is_fixed: boolean;
     team_name?: string;
     event_type: EventTypeChoice;
