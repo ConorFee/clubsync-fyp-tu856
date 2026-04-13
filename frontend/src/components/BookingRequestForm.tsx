@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import {
   fetchBookingRequest,
   createBookingRequest,
@@ -51,6 +52,8 @@ const initialFormData = {
 export default function BookingRequestForm() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isCoach = user?.role === 'coach';
   const isEditMode = !!id;
 
   const [formData, setFormData] = useState(initialFormData);
@@ -85,6 +88,8 @@ export default function BookingRequestForm() {
             scheduleFrom: req.schedule_from,
             scheduleUntil: req.schedule_until,
           });
+        } else if (isCoach && user?.team) {
+          setFormData((prev) => ({ ...prev, team: user.team! }));
         }
       } catch {
         setPageError("Failed to load data. Is the backend running?");
@@ -252,6 +257,7 @@ export default function BookingRequestForm() {
                 id="brf-team"
                 value={formData.team}
                 onChange={(e) => setFormData({ ...formData, team: e.target.value })}
+                disabled={isCoach && !!user?.team}
               >
                 <option value="">Select a team</option>
                 {teams.map((t) => (
