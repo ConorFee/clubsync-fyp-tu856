@@ -125,6 +125,7 @@ export default function EventFormModal({
       is_fixed: formData.isFixed,
       team_name: formData.teamName || undefined,
       event_type: formData.eventType,
+      ...(!isEditMode && { status: 'published' }),
     };
 
     setLoading(true);

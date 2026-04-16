@@ -47,6 +47,7 @@ export default function CalendarPage() {
   };
 
   const handleEditEvent = (event: ScheduleEvent) => {
+    if (!isAdmin) return;
     setSelectedEvent(event);
     setIsModalOpen(true);
   };

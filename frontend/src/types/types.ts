@@ -108,4 +108,5 @@ export interface CreateEventPayload {
     is_fixed: boolean;
     team_name?: string;
     event_type: EventTypeChoice;
+    status?: string;
 }
