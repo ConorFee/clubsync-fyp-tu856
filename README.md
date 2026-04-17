@@ -1,151 +1,112 @@
 # ClubSync - GAA Club Scheduling System
 
-**Author:** Conor Fee (C22414306)  
-**Supervisor:** Paul Laird  
-**Institution:** Technological University Dublin  
+**Author:** Conor Fee (C22414306)
+**Supervisor:** Paul Laird
+**Institution:** Technological University Dublin (TU856)
 **Academic Year:** 2025/26
 
 ---
 
 ## Project Overview
 
-ClubSync is a web-based scheduling application designed for Irish GAA clubs to eliminate weekly scheduling conflicts through intelligent constraint programming and an intuitive user interface. The system combines automated conflict-free scheduling with real-time facility management.
+ClubSync is a web-based scheduling application designed for Irish GAA clubs to eliminate weekly scheduling conflicts through constraint programming. The system combines automated conflict-free schedule generation with a generate-review-publish workflow, giving club administrators full control over the final timetable.
 
-**Problem Statement:** 78% of GAA clubs experience regular scheduling conflicts, with 89% citing pitch double-bookings as the primary issue. Clubs currently rely on fragmented tools like WhatsApp and Excel, resulting in volunteer burnout and coordination chaos.
+**Problem:** 84% of GAA club administrators experience regular scheduling conflicts, with clubs relying on WhatsApp and spreadsheets to coordinate across multiple teams and limited facilities.
 
-**Solution:** ClubSync provides a single source of truth for weekly activity scheduling, automatically generating conflict-free timetables while respecting fixed county fixtures, limited facilities, and volunteer availability.
+**Solution:** ClubSync provides a single platform where coaches submit booking requests with preferences, and an OR-Tools CP-SAT solver generates optimal conflict-free schedules that administrators can review and publish.
 
 ---
 
 ## Architecture
 
 ```
-clubsync-fyp-tu856/
-├── backend/          # Django REST Framework API
-├── frontend/         # React + TypeScript UI
+clubsync/
+├── backend/           # Django REST Framework API + CP-SAT solver
+│   ├── scheduler/     # Models, views, serializers, solver, tests
+│   ├── clubsync_project/  # Django settings, URLs
+│   └── manage.py
+├── frontend/          # React + TypeScript SPA
+│   ├── src/
+│   │   ├── api/       # Type-safe Axios API layer
+│   │   ├── components/  # UI components (EventFormModal, SolverReviewPanel, etc.)
+│   │   ├── pages/     # 7 page components
+│   │   ├── context/   # AuthContext (session management)
+│   │   └── types/     # TypeScript interfaces
+│   └── vite.config.ts
+├── docs/              # Supporting documentation (test cases, UAT results)
+├── Dockerfile         # Multi-stage build (Node + Python)
 └── README.md
 ```
 
 **Technology Stack:**
-- **Backend:** Django 5.2.8 + Django REST Framework + PostgreSQL
-- **Frontend:** React 19 + TypeScript + Vite + FullCalendar
-- **Solver:** Google OR-Tools CP-SAT
-- **Deployment:** Docker + DigitalOcean
+
+| Layer | Technology |
+|-------|-----------|
+| Backend | Django 5.2.8 + Django REST Framework + PostgreSQL |
+| Frontend | React 19 + TypeScript + Vite + FullCalendar + Bootstrap 5 |
+| Solver | Google OR-Tools CP-SAT (Constraint Programming) |
+| Deployment | Docker (multi-stage) + Render (auto-deploy on push) |
+| Auth | Django session-based with CSRF protection |
 
 ---
 
-## Feature 1: Data Layer & Django Backend
+## Features
 
-**Status:**  **Implemented & Tested**
+### Two-Path Scheduling System
 
-### Database Schema (PostgreSQL)
+- **Path 1 (Direct):** Admin creates events manually via the calendar modal. Overlap prevention enforced at the database level.
+- **Path 2 (Solver):** Coaches submit booking requests with preferences. Admin runs the CP-SAT solver to generate an optimal schedule, reviews proposed assignments in the SolverReviewPanel, then publishes or discards.
 
-**Models:**
-- `Facility` - Represents club facilities (pitches, halls, gyms)
-  - Fields: `id`, `name`, `type`
-- `Event` - Scheduled activities and fixtures
-  - Fields: `id`, `title`, `start_time`, `end_time`, `facility_id`, `is_fixed`, `team_name`
-  - **Hard Constraint:** Overlap prevention enforced in `save()` method
+### Constraint Programming Solver
 
-**ACID Compliance:**
-- Atomicity: All-or-nothing event creation
-- Consistency: Constraints enforced before/after transactions
-- Isolation: Concurrent booking prevention
-- Durability: Permanent storage guarantee
+The solver formulates scheduling as a Constraint Satisfaction and Optimisation Problem (CSOP):
 
-### REST API Endpoints
+- **7 Hard Constraints:** No facility overlap (HC1), fixed events immovable (HC2), team single-location (HC3), warmup buffer for matches (HC4), duration match (HC6), facility-type compatibility (HC7)
+- **6 Soft Constraints:** Preferred facility (SC1), preferred day (SC2), preferred time window (SC3), usual time adherence (SC4), priority multiplier (SC5), younger teams earlier (SC6)
+- **Solve time:** Typically under 0.03 seconds
 
-Exposed endpoints for frontend integration:
+### Role-Based Access Control
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/facilities/` | List all facilities |
-| `GET` | `/api/events/` | List all events (ordered by start_time) |
-| `POST` | `/api/events/` | Create new event (with validation) |
-| `POST` | `/api/schedule/solve/` | Validate schedule with OR-Tools |
+| Role | Permissions |
+|------|------------|
+| Admin | Full access — create events, manage requests, run solver, publish schedules |
+| Coach | Submit booking requests for assigned team, view own requests, view calendar |
+| Viewer | Read-only calendar access |
 
-**CORS Configuration:** Enabled for frontend development (`localhost:5173`)
+### Colour-Coded Calendar
 
-### OR-Tools Constraint Solver
-
-**Implementation:** `scheduler/views.py` - `solve_schedule()`
-
-**Hard Constraints Enforced:**
-1. No overlapping bookings on same facility
-2. County fixtures (`is_fixed=True`) cannot be moved
-3. 15-minute changeover buffer between events
-4. Team cannot be in two locations simultaneously
-
-**Solver Output:**
-```json
-{
-  "status": true,
-  "message": "Schedule is conflict-free and feasible!",
-  "non_fixed_events_checked": 12,
-  "solver_status": "OPTIMAL"
-}
-```
-
-### Sample Data Loader
-
-**Management Command:** `python manage.py load_sample_data`
-
-Populates database with realistic An Tóchar GAA club data:
-- 4 facilities (Main Pitch, Training Pitch, Hall, Gym)
-- 15+ sample events including fixed county fixtures
-- Representative weekly schedule scenarios
+- Red = Fixed (county fixtures, immovable)
+- Green = Published (confirmed schedule)
+- Orange = Proposed (solver output, pending review)
+- Grey = Draft
 
 ---
 
-## Feature 2: React Frontend (In Progress)
+## Data Models
 
-**Status:** **Foundation Complete, UI Components In Development**
+| Model | Purpose |
+|-------|---------|
+| Facility | Club facilities with type and suitable event types (JSON) |
+| Team | Age group, usual training day/time/facility, flexibility flag |
+| Event | Scheduled events with status, facility FK, team FK, fixed flag |
+| BookingRequest | Coach preferences — facility, days, time window, recurrence, auto-derived priority |
+| UserProfile | Links Django User to role (admin/coach/viewer) and team |
 
-### Technology Setup
+---
 
-**Framework:** React 19 + TypeScript + Vite  
-**Key Libraries:**
-- `axios` - HTTP client for Django API
-- `@fullcalendar/react` - Calendar UI component
-- `date-fns` - Date manipulation utilities
+## API Endpoints
 
-### Type Safety
-
-**TypeScript Interfaces:** `frontend/src/types/types.ts`
-
-```typescript
-export interface EventType {
-  id: number;
-  title: string;
-  start_time: string;
-  end_time: string;
-  facility: { name: string };
-  is_fixed: boolean;
-}
-
-export interface FacilityType {
-  id: number;
-  name: string;
-  type: string;
-}
-```
-
-### API Service Layer
-
-**Location:** `frontend/src/api/events.ts`
-
-Type-safe API client with typed responses:
-```typescript
-export async function fetchEvents(): Promise<EventType[]>
-export async function fetchFacilities(): Promise<FacilityType[]>
-```
-
-### Planned Components
-
-- `WeeklySchedule` - Main calendar view with FullCalendar
-- `FacilitySidebar` - Real-time facility availability
-- `EventCard` - Individual event display with conflict indicators
-- `SolverStatus` - OR-Tools validation results
+| Method | Endpoint | Description | Permission |
+|--------|----------|-------------|-----------|
+| GET | `/api/facilities/` | List facilities | Authenticated |
+| GET/POST | `/api/events/` | List/create events | Auth / Admin |
+| GET/POST | `/api/requests/` | List/create booking requests | Coach or Admin |
+| POST | `/api/schedule/generate/` | Run CP-SAT solver | Admin |
+| POST | `/api/schedule/publish/` | Publish proposed schedule | Admin |
+| POST | `/api/schedule/discard/` | Discard proposed schedule | Admin |
+| POST | `/api/auth/login/` | Session login | Public |
+| POST | `/api/auth/logout/` | Session logout | Authenticated |
+| GET | `/api/auth/me/` | Current user info | Authenticated |
 
 ---
 
@@ -154,7 +115,7 @@ export async function fetchFacilities(): Promise<FacilityType[]>
 ### Prerequisites
 
 - Python 3.11+
-- Node.js 18+ & npm
+- Node.js 18+ and npm
 - PostgreSQL 15+
 
 ### Backend Setup
@@ -163,28 +124,32 @@ export async function fetchFacilities(): Promise<FacilityType[]>
 cd backend
 
 # Create virtual environment
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+python -m venv clubsync_venv
+source clubsync_venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
 
 # Configure environment
-cp .env.example .env
-# Edit .env with your PostgreSQL credentials
+# Create backend/.env with:
+#   SECRET_KEY=your-secret-key
+#   DB_NAME=clubsync_db
+#   DB_USER=clubsync
+#   DB_PASSWORD=your-password
+#   DB_HOST=localhost
+#   DB_PORT=5432
 
 # Run migrations
-python manage.py makemigrations
 python manage.py migrate
 
 # Load sample data
 python manage.py load_sample_data
 
-# Start Django server
+# Start server
 python manage.py runserver
 ```
 
-**Backend running at:** `http://localhost:8000`
+Backend runs at `http://localhost:8000`
 
 ### Frontend Setup
 
@@ -194,92 +159,77 @@ cd frontend
 # Install dependencies
 npm install
 
-# Start Vite dev server
+# Start dev server (proxies /api/* to Django)
 npm run dev
 ```
 
-**Frontend running at:** `http://localhost:5173`
+Frontend runs at `http://localhost:5173`
+
+### Test Accounts
+
+| Username | Password | Role |
+|----------|----------|------|
+| admin | admin123 | Admin |
+| coach | coach123 | Coach (U14 Boys) |
+| viewer | viewer123 | Viewer |
+
+### Sample Data
+
+The `load_sample_data` command creates: 4 facilities, 8 teams, 3 fixed events (county fixtures), 9 booking requests, and 3 user accounts.
 
 ---
 
-## 🧪 Testing
-
-### Backend Tests
+## Testing
 
 ```bash
 cd backend
+source clubsync_venv/bin/activate
 python manage.py test
 ```
 
-**Test Coverage:**
-- Model validation (overlap prevention)
-- API endpoint responses
-- OR-Tools solver logic
+**42 automated tests** across 4 modules:
 
-### API Testing
+| Module | Tests | Coverage |
+|--------|-------|----------|
+| `test_models.py` | 9 | Model validation, overlap prevention, priority derivation |
+| `test_serializers.py` | 5 | Serializer validation, time window checks, auto-derived fields |
+| `test_solver.py` | 11 | Hard constraints (HC1-HC7), soft constraints (SC1, SC3), solver status |
+| `test_api.py` | 17 | CRUD operations, permissions, generate/publish/discard workflow |
 
-**Example cURL requests:**
-
-```bash
-# Get all events
-curl http://localhost:8000/api/events/
-
-# Validate schedule
-curl -X POST http://localhost:8000/api/schedule/solve/
-```
+Manual test scenarios (15 cases covering happy paths, unhappy paths, and edge cases) are documented in `docs/manual_test_cases.md`.
 
 ---
 
-## Current Progress
+## Deployment
 
-### Completed (Interim Submission)
+ClubSync is deployed using a multi-stage Docker build on Render:
 
-- [x] PostgreSQL database schema with ACID compliance
-- [x] Django REST API with CORS configuration
-- [x] OR-Tools CP-SAT solver integration
-- [x] Hard constraint enforcement (overlap prevention)
-- [x] Sample data from An Tóchar GAA club
-- [x] Management command for data loading
-- [x] React + TypeScript frontend foundation
-- [x] TypeScript type definitions
-- [x] API service layer with type safety
-
-### In Progress (Week 12-13)
-
-- [ ] WeeklySchedule component with FullCalendar
-- [ ] Facility dashboard UI
-- [ ] Frontend-backend integration
-- [ ] Event creation form
-- [ ] Real-time validation feedback
-
-### Planned (Week 14-20)
-
-- [ ] ICS file import for county fixtures
-- [ ] Team model implementation
-- [ ] Unit test suite (>80% coverage)
-- [ ] Docker containerization
-- [ ] Deployment to DigitalOcean
-- [ ] User Acceptance Testing with An Tóchar GAA
-- [ ] Predictive analytics (volunteer demand forecasting)
+- **Stage 1:** Node builds the React frontend (`npm run build`)
+- **Stage 2:** Python serves Django + static files via Gunicorn + WhiteNoise
+- SPA catch-all route serves `index.html` for client-side routing
+- Auto-deploys on push to `master`
 
 ---
 
 ## Documentation
 
-- **Interim Report:** Detailed system analysis, design, and methodology
-- **Presentation Slides:** Architecture diagrams and demo walkthrough
-- **API Documentation:** Endpoint specifications and response formats
-- **Type Definitions:** TypeScript interfaces for frontend-backend contract
+| Document | Location |
+|----------|----------|
+| Manual test scenarios | `docs/manual_test_cases.md` |
+| UAT plan and methodology | `docs/uat_usability_plan.md` |
+| UAT feedback results | `docs/UAT_Feedback_Form.md` |
+| Bug documentation | `docs/bugs_to_investigate.md` |
+| Bug fix analysis | `docs/bug_fix_coach_team_filter.md` |
 
 ---
 
-##  Acknowledgments
+## Acknowledgements
 
 - **Supervisor:** Paul Laird (TU Dublin)
-- **Data Source:** An Tóchar GAA Club
-- **Survey Participants:** Club administrators, coaches, and members
+- **Partner Club:** An Tochar GAA
+- **Survey Participants:** Club administrators, coaches, and members who provided requirements data
 
 ---
 
-**Last Updated:** December 2025  
-**Project Status:** Interim Submission - MVP Foundation Complete
+**Last Updated:** April 2026
+**Project Status:** Final Submission Complete
