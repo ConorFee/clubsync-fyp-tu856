@@ -7,7 +7,7 @@ Creates:
 - 4 Facilities (Main Pitch, Training Pitch, Hall, Gym)
 - 8 Teams with age_groups, usual_day/time, is_flexible flags
 - 3 Fixed events (county fixtures)
-- 9 BookingRequests with varied preferences, priorities, days (includes 1 one-time event)
+- 8 BookingRequests with varied preferences, priorities, days (includes 1 one-time event; U14 Boys omitted — added live during demo)
 """
 
 from datetime import date, time
@@ -93,24 +93,24 @@ class Command(BaseCommand):
         self.stdout.write('Creating fixed events...')
         Event.objects.create(
             title='County U14 Football Championship',
-            start_time=timezone.make_aware(timezone.datetime(2026, 3, 8, 11, 0)),
-            end_time=timezone.make_aware(timezone.datetime(2026, 3, 8, 13, 30)),
+            start_time=timezone.make_aware(timezone.datetime(2026, 5, 3, 11, 0)),
+            end_time=timezone.make_aware(timezone.datetime(2026, 5, 3, 13, 30)),
             facility=main_pitch, is_fixed=True,
             event_type='championship', status='published',
             team=u14_boys, team_name='U14 Boys',
         )
         Event.objects.create(
             title='County Senior Football League',
-            start_time=timezone.make_aware(timezone.datetime(2026, 3, 15, 14, 0)),
-            end_time=timezone.make_aware(timezone.datetime(2026, 3, 15, 16, 30)),
+            start_time=timezone.make_aware(timezone.datetime(2026, 5, 10, 14, 0)),
+            end_time=timezone.make_aware(timezone.datetime(2026, 5, 10, 16, 30)),
             facility=main_pitch, is_fixed=True,
             event_type='match', status='published',
             team=senior_men, team_name='Senior Men',
         )
         Event.objects.create(
             title='County Hurling League',
-            start_time=timezone.make_aware(timezone.datetime(2026, 3, 22, 14, 0)),
-            end_time=timezone.make_aware(timezone.datetime(2026, 3, 22, 16, 30)),
+            start_time=timezone.make_aware(timezone.datetime(2026, 5, 17, 14, 0)),
+            end_time=timezone.make_aware(timezone.datetime(2026, 5, 17, 16, 30)),
             facility=main_pitch, is_fixed=True,
             event_type='match', status='published',
             team=hurlers, team_name='Senior Hurlers',
@@ -119,9 +119,9 @@ class Command(BaseCommand):
         # ── Booking Requests (Pending — ready for solver) ──
         self.stdout.write('Creating booking requests...')
 
-        # Schedule period: March 2026
-        march_from = date(2026, 3, 1)
-        march_until = date(2026, 3, 31)
+        # Schedule period: late April through end of May 2026
+        sched_from = date(2026, 4, 28)
+        sched_until = date(2026, 5, 31)
 
         BookingRequest.objects.create(
             team=u10_boys, title='U10 Boys Weekly Training',
@@ -131,7 +131,7 @@ class Command(BaseCommand):
             preferred_days=['tuesday'],
             preferred_time_start=time(17, 30), preferred_time_end=time(19, 0),
             priority=2,
-            schedule_from=march_from, schedule_until=march_until,
+            schedule_from=sched_from, schedule_until=sched_until,
         )
 
         BookingRequest.objects.create(
@@ -142,18 +142,7 @@ class Command(BaseCommand):
             preferred_days=['wednesday'],
             preferred_time_start=time(17, 30), preferred_time_end=time(19, 0),
             priority=2,
-            schedule_from=march_from, schedule_until=march_until,
-        )
-
-        BookingRequest.objects.create(
-            team=u14_boys, title='U14 Boys Weekly Training',
-            event_type='juvenile_training', duration_minutes=60,
-            recurrence='weekly',
-            preferred_facility=main_pitch,
-            preferred_days=['thursday'],
-            preferred_time_start=time(18, 0), preferred_time_end=time(20, 0),
-            priority=3,
-            schedule_from=march_from, schedule_until=march_until,
+            schedule_from=sched_from, schedule_until=sched_until,
         )
 
         BookingRequest.objects.create(
@@ -164,7 +153,7 @@ class Command(BaseCommand):
             preferred_days=['tuesday', 'wednesday'],
             preferred_time_start=time(19, 0), preferred_time_end=time(21, 30),
             priority=2,
-            schedule_from=march_from, schedule_until=march_until,
+            schedule_from=sched_from, schedule_until=sched_until,
         )
 
         BookingRequest.objects.create(
@@ -175,7 +164,7 @@ class Command(BaseCommand):
             preferred_days=['tuesday', 'thursday'],
             preferred_time_start=time(19, 30), preferred_time_end=time(22, 0),
             priority=3,
-            schedule_from=march_from, schedule_until=march_until,
+            schedule_from=sched_from, schedule_until=sched_until,
         )
 
         BookingRequest.objects.create(
@@ -186,7 +175,7 @@ class Command(BaseCommand):
             preferred_days=['wednesday'],
             preferred_time_start=time(18, 0), preferred_time_end=time(20, 0),
             priority=2,
-            schedule_from=march_from, schedule_until=march_until,
+            schedule_from=sched_from, schedule_until=sched_until,
         )
 
         BookingRequest.objects.create(
@@ -197,7 +186,7 @@ class Command(BaseCommand):
             preferred_days=['thursday'],
             preferred_time_start=time(19, 30), preferred_time_end=time(22, 0),
             priority=2,
-            schedule_from=march_from, schedule_until=march_until,
+            schedule_from=sched_from, schedule_until=sched_until,
         )
 
         BookingRequest.objects.create(
@@ -208,7 +197,7 @@ class Command(BaseCommand):
             preferred_days=['monday', 'wednesday'],
             preferred_time_start=time(19, 0), preferred_time_end=time(21, 0),
             priority=1,
-            schedule_from=march_from, schedule_until=march_until,
+            schedule_from=sched_from, schedule_until=sched_until,
         )
 
         # One-time event using target_date
@@ -218,10 +207,10 @@ class Command(BaseCommand):
             recurrence='once',
             preferred_facility=hall,
             preferred_days=['saturday'],
-            target_date=date(2026, 3, 14),
+            target_date=date(2026, 5, 3),
             preferred_time_start=time(10, 0), preferred_time_end=time(12, 0),
             priority=3,
-            schedule_from=date(2026, 3, 14), schedule_until=date(2026, 3, 14),
+            schedule_from=date(2026, 5, 3), schedule_until=date(2026, 5, 3),
         )
 
         # ── Users ──
@@ -248,5 +237,5 @@ class Command(BaseCommand):
         UserProfile.objects.create(user=viewer_user, role='viewer')
 
         self.stdout.write(self.style.SUCCESS(
-            'Sample data loaded: 4 facilities, 8 teams, 3 fixed events, 9 booking requests, 3 users (admin/coach/viewer)'
+            'Sample data loaded: 4 facilities, 8 teams, 3 fixed events, 8 booking requests, 3 users (admin/coach/viewer)'
         ))
